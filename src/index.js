@@ -1,6 +1,17 @@
 import { parse } from "@babel/parser";
+import traverse from "@babel/traverse";
 
-const ast = parse(`a b`, { errorRecovery: true });
+const plugin = function (babel) {
+	var t = babel.types;
+	return {
+		visitor: {
+			Function: {
+				enter (path) {
+					console.log(path);
+				}
+			}
+		}
+	};
+}
 
-console.log(ast.errors[0].code); // BABEL_PARSER_SYNTAX_ERROR
-console.log(ast.errors[0].reasonCode); // MissingSemicolon
+export { plugin };
