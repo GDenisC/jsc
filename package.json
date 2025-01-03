@@ -1,0 +1,27 @@
+{
+  "name": "jsc",
+  "version": "0.0.1",
+  "description": "Babel Plugin for Compiling JavaScript Code Structures",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/GDenisC/jsc.git"
+  },
+  "keywords": [
+    "babel",
+    "javascript"
+  ],
+  "type": "module",
+  "author": "GDenisC",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/GDenisC/jsc/issues"
+  },
+  "homepage": "https://github.com/GDenisC/jsc#readme",
+  "dependencies": {
+    "@babel/parser": "^7.26.3"
+  }
+}
