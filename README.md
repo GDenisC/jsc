@@ -2,6 +2,7 @@
 
 ## `-S` `--struct`
 
+### Example 1
 ```js
 class Foo {
     constructor() {
@@ -17,6 +18,7 @@ console.log(new Foo().x);
 ```
 ```js
 function Foo_constructor() {
+    /* or just return { x: 1 } */
     var self = {};
     self.x = 1;
     return self;
@@ -27,6 +29,33 @@ function Foo_get_x(self) {
 }
 
 console.log(Foo_get_x(Foo_constructor()));
+```
+
+### Example 2
+```js
+class Foo {
+    getHelloString() {
+        return 'hello';
+    }
+}
+
+class Bar extends Foo {
+    getHelloString() {
+        return super.getHelloString() + ' world';
+    }
+}
+
+console.log(new Bar().getHelloString());
+```
+```js
+function Foo_getHelloString(self) {
+    return 'hello';
+}
+function Bar_getHelloString(self) {
+    return Foo_getHelloString(self) + ' world';
+}
+
+console.log(Bar_getHelloString({}));
 ```
 
 ## `-P` `--precalc`
@@ -43,7 +72,7 @@ function foo(x) {
 }
 ```
 
-## `-G` `--global`
+## `-UG` `--un-global`
 
 ```js
 function randomInt(x) {
@@ -72,6 +101,49 @@ randomInt(20);
 ```js
 Math.floor(Math.random() * 10);
 Math.floor(Math.random() * 20);
+```
+
+## `@macro`
+
+```js
+/** @macro */
+const PI = 3.14;
+
+/** @macro */
+function LOG(a) {
+    console.log(a);
+}
+
+LOG(PI);
+```
+```js
+console.log(3.14);
+```
+
+## `@const`
+Variable that will be evaluated at compile time
+
+```js
+/** @const */
+const ARR = [1, 10, 100, 1000];
+
+/** @const */
+const WORD = (() => {
+    let words = ['answer is ', 'answer = ', 'hello, '];
+    return words[Math.floor(Math.random() * words.length)];
+})();
+
+console.log(WORD + ARR[2] * ARR[3]);
+```
+if i run the program 3 times:
+```js
+console.log('answer is ' + 100 * 1000);
+```
+```js
+console.log('answer = ' + 100 * 1000);
+```
+```js
+console.log('hello, ' + 100 * 1000);
 ```
 
 ## `--stack`
@@ -115,25 +187,45 @@ random();
 console.log(reg0);
 ```
 
+## `-B` `bytecode`
+bytecode build
+- less size
+- can be slower than js
+- fast build
+
 ## `-A` `--asm`
 ASM.js build
+- same size
+- a bit faster than js
+- fast build
 
 ## `-W` `--wasm`
 WASM build
+- less size
+- much faster than js
+- slow build
 
 # Checklist
+
+- [ ] JavaScript reader
 
 - [ ] `--struct`
 
 - [ ] `--precalc`
 
-- [ ] `--global`
+- [ ] `--un-global`
 
 - [ ] `@inline`
+
+- [ ] `@macro`
+
+- [ ] `@const`
 
 - [ ] `--stack`
 
 - [ ] `--registers`
+
+- [ ] `--bytecode`
 
 - [ ] `--asm`
 
