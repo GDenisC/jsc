@@ -4,7 +4,7 @@
 Converts a Class declaration into a series of equivalent function declarations.
 Only works with top-level classes.
 - V8 optimizations
-- Better minification
+- Better code compression results
 
 ### Example 1
 ```js
@@ -77,7 +77,8 @@ function foo(x) {
 ```
 
 ## Unglobalization
-Harder to hook (to hack)
+- Patches some hooking techniques (replacing a function/method with a malicious clone)
+- Better code compression results
 
 ```js
 function randomInt(x) {
@@ -96,7 +97,8 @@ function randomInt(x) {
 functions and class methods
 
 ```js
-/** @inline */ function randomInt(x) {
+/** @inline */
+function randomInt(x) {
     return Math.floor(Math.random() * x);
 }
 
@@ -212,7 +214,7 @@ console.log(reg0);
 
 - [ ] JavaScript reader
 
-- [ ] Structs
+- [ ] Class Destructuring
 
 - [ ] Precalculation
 
