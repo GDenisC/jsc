@@ -26,9 +26,9 @@ function Foo_static_count() {
 }
 
 let Foo_static_private_id = 0;
-function Foo_constructor(name) {
+function Foo_constructor(name = Foo_static_private_defaultName) {
 	const self = {};
-	self.name = name ?? Foo_static_private_defaultName;
+	self.name = name;
 	self.Foo_static_private_id = Foo_static_private_tickId++;
 	Foo_static_instances.push(self);
 	return self;

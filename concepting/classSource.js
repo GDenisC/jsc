@@ -18,8 +18,8 @@ class Foo {
 	}
 
 	#id = 0;
-	constructor (name) {
-		this.name = name ?? Foo.#defaultName;
+	constructor (name = Foo.#defaultName) {
+		this.name = name;
 		this.#id = Foo.#tickId++;
 		Foo.instances.push(this);
 	}
