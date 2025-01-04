@@ -1,6 +1,6 @@
 # JavaScript Compiler
 
-## Structs
+## Class Destructuring
 - V8 optimizations
 - Better minification
 
