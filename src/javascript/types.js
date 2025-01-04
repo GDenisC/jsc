@@ -1,28 +1,15 @@
-export function Location(posStart, posEnd, lineStart, lineEnd) {
+export function Location(posStart, posEnd, colStart, colEnd) {
     return {
         position: {
             start: posStart,
             end: posEnd
         },
         line: {
-            start: lineStart,
-            end: lineEnd
+            start: colStart,
+            end: colEnd
         }
     };
 }
-
-export const operators = [
-    '+', '-', '*', '/', '%', '**',
-    '==', '!=', '===', '!==',
-    '>', '>=', '<', '<=',
-    '&', '|', '^', '>>', '>>>', '<<', '<<<',
-    '&&', '||',
-    '!',
-    '++', '--',
-    '+=', '-=', '*=', '/=', '%=', '**=',
-    '&=', '|=', '^=', '>>=', '>>>=', '<<=',
-    '&&=', '||=',
-];
 
 // Literals
 
