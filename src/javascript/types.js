@@ -113,6 +113,16 @@ export function TernaryExpression(test, consequent, alternate, loc) {
     return { type: 'TernaryExpression', test, consequent, alternate, loc };
 }
 
+/** await {expression} */
+export function AwaitExpression(expression, loc) {
+    return { type: 'AwaitExpression', expression, loc };
+}
+
+/** yield {argument} */
+export function YieldExpression(argument, loc) {
+    return { type: 'YieldExpression', argument, loc };
+}
+
 // Statements
 
 /** `;` */
@@ -196,8 +206,8 @@ export function VariableDeclarations(kind, declarations, loc) {
 }
 
 /** `function {name}({params}) {body}` */
-export function FunctionDeclaration(name, params, body, loc) {
-    return { type: 'FunctionDeclaration', name, params, body, loc };
+export function FunctionDeclaration(name, params, body, isAsync, isGenerator, loc) {
+    return { type: 'FunctionDeclaration', name, params, body, isAsync, isGenerator, loc };
 }
 
 /** `class {name} [extends {superClass}] {body}`, `name` must be `Identifier`, `superClass` must be undefined or a reference to `Identifier` */
@@ -206,8 +216,8 @@ export function ClassDeclaration(name, body, superClass, loc) {
 }
 
 /** `[static] {name}({params}) {body}` */
-export function ClassMethod(name, params, body, isStatic, loc) {
-    return { type: 'ClassMethod', name, params, body, isStatic, loc };
+export function ClassMethod(name, params, body, isStatic, isAsync, loc) {
+    return { type: 'ClassMethod', name, params, body, isStatic, isAsync, loc };
 }
 
 //(?) [static] {name} = {value}

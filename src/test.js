@@ -95,10 +95,39 @@ const STATEMENTS = [
 import generate from './javascript/generator.js';
 import { types } from './javascript/index.js'
 
-let result;
+let code = types.CodeStatement([
+    types.FunctionDeclaration(
+        null,
+        [],
+        types.BlockStatement([
+            types.ForStatement(
+                types.VariableDeclaration('let', 'i', types.NumberLiteral(1000)),
+                types.Operator(
+                    null,
+                    '--',
+                    types.Identifier('i')
+                ),
+                null,
+                types.YieldExpression(
+                    types.CallExpression(
+                        types.MemberExpression(
+                            types.Identifier('Math'),
+                            types.Identifier('pow')
+                        ),
+                        [
+                            types.NumberLiteral(2),
+                            types.Identifier('i')
+                        ]
+                    )
+                )
+            ),
+        ]),
+        false,
+        true
+    )
+]);
 
-console.time('generating code');
-result = generate(types.CodeStatement([
+/*types.CodeStatement([
     types.VariableDeclarations('var', [
         types.VariableDeclaration(null, 'a', types.NumberLiteral(1)),
         types.VariableDeclaration(null, 'b', types.NumberLiteral(2)),
@@ -121,7 +150,12 @@ result = generate(types.CodeStatement([
             )
         ]
     )
-]));
+])*/;
+
+let result;
+
+console.time('generating code');
+result = generate(code);
 console.timeEnd('generating code');
 
 console.log(result);

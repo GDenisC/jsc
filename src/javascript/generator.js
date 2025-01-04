@@ -3,7 +3,7 @@ function generate(type, noSemicolon) {
         throw new Error('type must not be falsy');
 
     if (typeof type.type != 'string')
-        throw new Error('type must be a string but got ' + type.type + ' (' + type + ')');
+        throw new Error('type must be a string but got ' + type.type + ' (' + JSON.stringify(type) + ')');
 
     const semicolon = noSemicolon ? '' : ';';
 
@@ -16,7 +16,7 @@ function generate(type, noSemicolon) {
         case 'UndefinedLiteral': return 'undefined' + semicolon;
         case 'Identifier': return type.name + semicolon;
         case 'ThisExpression': return 'this' + semicolon;
-        case 'Operator': return generate(type.left, true) + type.operator + generate(type.right, true) + semicolon;
+        case 'Operator': return (type.left ? generate(type.left, true) : '') + type.operator + (type.right ? generate(type.right, true) : '') + semicolon;
         case 'ParenExpression': return '(' + generate(type.expression, true) + ')' + semicolon;
         case 'MemberExpression': return generate(type.object, true) + '.' + generate(type.property, true) + semicolon;
         case 'ArrayExpression': return '[' + generateArray(type.elements, true).join(',') + ']' + semicolon;
@@ -25,13 +25,15 @@ function generate(type, noSemicolon) {
         case 'ObjectExpression': return '{' + generateArray(type.properties, true).join(',') + '}' + semicolon;
         case 'ObjectProperty': return generate(type.key, true) + ':' + generate(type.value, true);
         case 'TernaryExpression': return generate(type.consequent, true) + '?' + generate(type.alternate, true) + ':' + generate(type.test, true) + semicolon;
-        case 'SemicolonStatement': return '/* ; */';
+        case 'AwaitExpression': return 'await ' + generate(type.argument, true) + semicolon;
+        case 'YieldExpression': return 'yield ' + generate(type.argument, true) + semicolon;
+        case 'SemicolonStatement': return semicolon;
         case 'ReturnStatement': return 'return ' + generate(type.argument, true) + semicolon;
         case 'BreakStatement': return 'break' + semicolon;
         case 'ContinueStatement': return 'continue' + semicolon;
         case 'BlockStatement': return '{' + generateArray(type.block, false).join('') + '}';
         case 'IfStatement': return 'if(' + generate(type.test, true) + ')' + generate(type.consequent, false) + (type.alternate ? ' else ' + generate(type.alternate, false) : '');
-        case 'ForStatement': return 'for(' + generate(type.init, true) + ';' + generate(type.test, true) + ';' + generate(type.update, true) + ')' + generate(type.body, false);
+        case 'ForStatement': return 'for(' + (type.init ? generate(type.init, true) : '') + ';' + (type.test ? generate(type.test, true) : '') + ';' + (type.update ? generate(type.update, true) : '') + ')' + generate(type.body, false);
         case 'ForInStatement': return 'for(' + generate(type.left, true) + ' in ' + generate(type.right, true) + ')' + generate(type.body, false);
         case 'ForOfStatement': return 'for(' + generate(type.left, true) + ' of ' + generate(type.right, true) + ')' + generate(type.body, false);
         case 'WhileStatement': return 'while(' + generate(type.test, true) + ')' + generate(type.body, false);
@@ -42,9 +44,9 @@ function generate(type, noSemicolon) {
         case 'VariableDeclaration': return type.kind + ' ' + type.name + (type.value ? '=' + generate(type.value, true) : '') + semicolon;
         case 'VarDecl': return type.name + (type.value ? '=' + generate(type.value, true) : '');
         case 'VariableDeclarations': return type.kind + ' ' + generateArray(type.declarations, true).join(',') + semicolon;
-        case 'FunctionDeclaration': return 'function ' + type.name + '(' + generateArray(type.params, true).join(',') + ')' + generate(type.body, false);
+        case 'FunctionDeclaration': return (type.isAsync ? 'async ' : '') + 'function' + (type.isGenerator ? '*' : '') + (type.name ? (type.isGenerator ? '' : ' ') + type.name : '') + '(' + generateArray(type.params, true).join(',') + ')' + generate(type.body, false);
         case 'ClassDeclaration': return 'class ' + generate(type.name, true) + (type.superClass ? ' extends ' + generate(type.superClass, true) : '') + generate(type.body, false);
-        case 'ClassMethod': return (type.isStatic ? 'static ' : '') + type.name + '(' + generateArray(type.params, true).join(',') + ')' + generate(type.body, false);
+        case 'ClassMethod': return (type.isAsync ? 'async ' : '') + (type.isStatic ? 'static ' : '') + type.name + '(' + generateArray(type.params, true).join(',') + ')' + generate(type.body, false);
         case 'CodeStatement': return generateArray(type.body, false).join('');
         default: throw new Error(type.type + ' is not implemented (' + type + '}');
     }
