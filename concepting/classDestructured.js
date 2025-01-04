@@ -4,8 +4,8 @@
 // [classname]_(public/private)_(static/instance)_(method/getter/setter/property)_[attributename]_{rng}
 //
 // NEW:
-// {classname}[_static][_(get|set)][_private]_{methodname}_{i}
-// [] = optional
+// {classname}[_static][_(get|set)][_private]_{methodname}[_{i}]
+// [] = conditionally applies
 
 let Foo_static_instances = [];
 let Foo_static_private_tickId = 0;
