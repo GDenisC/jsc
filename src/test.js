@@ -91,3 +91,37 @@ const STATEMENTS = [
     'class Foo { constructor(x) {} }',
     'class Foo { constructor(x, y, z) {} }'
 ];
+
+import generate from './javascript/generator.js';
+import { types } from './javascript/index.js'
+
+let result;
+
+console.time('generating code');
+result = generate(types.CodeStatement([
+    types.VariableDeclarations('var', [
+        types.VariableDeclaration(null, 'a', types.NumberLiteral(1)),
+        types.VariableDeclaration(null, 'b', types.NumberLiteral(2)),
+        types.VariableDeclaration(null, 'c', types.NumberLiteral(3))
+    ]),
+    types.CallExpression(
+        types.MemberExpression(
+            types.Identifier('console'),
+            types.Identifier('log')
+        ),
+        [
+            types.Operator(
+                types.ParenExpression(types.Operator(
+                    types.Identifier('a'),
+                    '+',
+                    types.Identifier('b')
+                )),
+                '*',
+                types.Identifier('c')
+            )
+        ]
+    )
+]));
+console.timeEnd('generating code');
+
+console.log(result);

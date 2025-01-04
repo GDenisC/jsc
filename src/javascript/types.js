@@ -36,9 +36,9 @@ export function StringLiteral(value, loc) {
     return { type: 'StringLiteral', value, loc };
 }
 
-/** / ... / */
-export function RegexLiteral(value, loc) {
-    return { type: 'RegexLiteral', value, loc };
+/** `/{value}/{flags}` */
+export function RegexLiteral(value, flags, loc) {
+    return { type: 'RegexLiteral', value, flags, loc };
 }
 
 /** `true` | `false` */
@@ -60,7 +60,7 @@ export function UndefinedLiteral(loc) {
 
 /** `[_w][_wn]` */
 export function Identifier(name, loc) {
-    return { type: 'identifier', name, loc };
+    return { type: 'Identifier', name, loc };
 }
 
 /** `this` */
@@ -88,19 +88,24 @@ export function ArrayExpression(elements, loc) {
     return { type: 'ArrayExpression', elements, loc };
 }
 
-/** `{callee}(..., ...)` */
+/** `{callee}(..., ...)`, `callee` is an ast */
 export function CallExpression(callee, args, loc) {
     return { type: 'CallExpression', callee, args, loc };
 }
 
-/** `new {callee}` | `new {callee}(..., ...)` */
+/** `new {callee}` | `new {callee}(..., ...)`, `callee` is an ast */
 export function NewExpression(callee, args, loc) {
     return { type: 'NewExpression', callee, args, loc };
 }
 
-/** `{}` | `{...}` */
+/** `{}` | `{...}`, `properties` is an array of `ObjectProperty` */
 export function ObjectExpression(properties, loc) {
     return { type: 'ObjectExpression', properties, loc };
+}
+
+/** {key}: {value}, `key` and `value` are an ast */
+export function ObjectProperty(key, value, loc) {
+    return { type: 'ObjectProperty', key, value, loc };
 }
 
 /** `{test} ? {consequent} : {alternate}` */
@@ -180,12 +185,12 @@ export function SwitchDefault(body, loc) {
     return { type: 'SwitchDefault', body, loc };
 }
 
-/** `{kind} {name}` | `{kind} {name} = {value}` */
+/** `{kind} {name}` | `{kind} {name} = {value}`, `name` is an string */
 export function VariableDeclaration(kind, name, value, loc) {
-    return { type: 'VariableDeclaration', kind, name, value, loc };
+    return { type: kind ? 'VariableDeclaration' : 'VarDecl', kind, name, value, loc };
 }
 
-/** `{kind} {}, {}, ...` | `{kind} {} = {}, {}, {} = {}, ...` */
+/** `{kind} {}, {}, ...` | `{kind} {} = {}, {}, {} = {}, ...`, `declarations` is an array of `VariableDeclaration` (`kind` must be undefined) */
 export function VariableDeclarations(kind, declarations, loc) {
     return { type: 'VariableDeclarations', kind, declarations, loc };
 }
@@ -195,7 +200,7 @@ export function FunctionDeclaration(name, params, body, loc) {
     return { type: 'FunctionDeclaration', name, params, body, loc };
 }
 
-/** `class {name} [extends {superClass}] {body}` */
+/** `class {name} [extends {superClass}] {body}`, `name` must be `Identifier`, `superClass` must be undefined or a reference to `Identifier` */
 export function ClassDeclaration(name, body, superClass, loc) {
     return { type: 'ClassDeclaration', name, body, superClass, loc };
 }
@@ -206,3 +211,7 @@ export function ClassMethod(name, params, body, isStatic, loc) {
 }
 
 //(?) [static] {name} = {value}
+
+export function CodeStatement(body, loc) {
+    return { type: 'CodeStatement', body, loc };
+}
