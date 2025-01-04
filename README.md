@@ -1,6 +1,8 @@
 # JavaScript Compiler
 
 ## Class Destructuring
+Converts a Class declaration into a series of equivalent function declarations.
+Only works with top-level classes.
 - V8 optimizations
 - Better minification
 
