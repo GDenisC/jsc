@@ -1,6 +1,8 @@
 # JavaScript Compiler
 
-## `-S` `--struct`
+## Structs
+- V8 optimizations
+- Better minification
 
 ### Example 1
 ```js
@@ -58,7 +60,7 @@ function Bar_getHelloString(self) {
 console.log(Bar_getHelloString({}));
 ```
 
-## `-P` `--precalc`
+## Precalculation
 
 ```js
 function foo(x) {
@@ -72,7 +74,8 @@ function foo(x) {
 }
 ```
 
-## `-UG` `--un-global`
+## Unglobalization
+Harder to hook (to hack)
 
 ```js
 function randomInt(x) {
@@ -146,7 +149,7 @@ console.log('answer = ' + 100 * 1000);
 console.log('hello, ' + 100 * 1000);
 ```
 
-## `--stack`
+## Stack
 
 ```js
 function random(min, max) {
@@ -166,7 +169,8 @@ random();
 console.log(__stack.pop());
 ```
 
-## `-R` `--registers`
+## Registers
+Recursion is not supported
 
 ```js
 function random(min, max) {
@@ -187,20 +191,17 @@ random();
 console.log(reg0);
 ```
 
-## `-B` `bytecode`
-bytecode build
+## Bytecode build
 - less size
 - can be slower than js
 - fast build
 
-## `-A` `--asm`
-ASM.js build
-- same size
+## ASM.js build
+- more size
 - a bit faster than js
 - fast build
 
-## `-W` `--wasm`
-WASM build
+## WASM build
 - less size
 - much faster than js
 - slow build
@@ -209,11 +210,11 @@ WASM build
 
 - [ ] JavaScript reader
 
-- [ ] `--struct`
+- [ ] Structs
 
-- [ ] `--precalc`
+- [ ] Precalculation
 
-- [ ] `--un-global`
+- [ ] Unglobalization
 
 - [ ] `@inline`
 
@@ -221,12 +222,12 @@ WASM build
 
 - [ ] `@const`
 
-- [ ] `--stack`
+- [ ] Stack
 
-- [ ] `--registers`
+- [ ] Registers
 
-- [ ] `--bytecode`
+- [ ] Bytecode
 
-- [ ] `--asm`
+- [ ] ASM.js
 
-- [ ] `--wasm`
+- [ ] WASM
