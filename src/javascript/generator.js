@@ -14,6 +14,7 @@ function generate(type, noSemicolon) {
         case 'BooleanLiteral': return type.value + semicolon;
         case 'NullLiteral': return 'null' + semicolon;
         case 'UndefinedLiteral': return 'undefined' + semicolon;
+        case 'VoidLiteral': return 'void' + semicolon;
         case 'Identifier': return type.name + semicolon;
         case 'ThisExpression': return 'this' + semicolon;
         case 'Operator': return (type.left ? generate(type.left, true) : '') + type.operator + (type.right ? generate(type.right, true) : '') + semicolon;
@@ -27,8 +28,14 @@ function generate(type, noSemicolon) {
         case 'TernaryExpression': return generate(type.consequent, true) + '?' + generate(type.alternate, true) + ':' + generate(type.test, true) + semicolon;
         case 'AwaitExpression': return 'await ' + generate(type.argument, true) + semicolon;
         case 'YieldExpression': return 'yield ' + generate(type.argument, true) + semicolon;
+        case 'TypeofExpression': return 'typeof ' + generate(type.expression, true) + semicolon;
+        case 'InstanceofExpression': return generate(type.left, true) + ' instanceof ' + generate(type.right, true) + semicolon;
+        case 'DeleteExpression': return 'delete ' + generate(type.argument, true) + semicolon;
+        case 'AsExpression': return generate(type.left, true) + ' as ' + generate(type.right, true) + semicolon;
+        case 'ImportStatement': return 'import' + (type.defaultExport ? ' ' + generate(type.defaultExport, true) + (type.exports ? ',' : ' ') : '') + (type.exports ? '{' + generateArray(type.exports, true).join(',') + '}' : '') + (type.defaultExport || type.exports ? 'from ' : '') + generate(type.moduleName, true) + semicolon;
+        case 'ExportStatement': return 'export ' + (type.isDefault ? 'default ' : '') + generate(type.argument, true) + semicolon;
         case 'SemicolonStatement': return semicolon;
-        case 'ReturnStatement': return 'return ' + generate(type.argument, true) + semicolon;
+        case 'ReturnStatement': return 'return' + (type.argument ? ' ' + generate(type.argument, true) : '') + semicolon;
         case 'BreakStatement': return 'break' + semicolon;
         case 'ContinueStatement': return 'continue' + semicolon;
         case 'BlockStatement': return '{' + generateArray(type.block, false).join('') + '}';

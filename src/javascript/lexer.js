@@ -1,7 +1,9 @@
 import { Location } from './types.js';
 
+export const reversedWords = 'constructor as if while for let const var break else continue default switch of async function await yield instanceof export import in new try catch throw finally do typeof delete static class'.split(' ').reverse();
+
 const operators = [
-    '+', '-', '*', '/', '%', '**',
+    '=', '+', '-', '*', '/', '%', '**',
     '==', '!=', '===', '!==',
     '>', '>=', '<', '<=',
     '&', '|', '^', '>>', '>>>', '<<', '<<<',
@@ -24,8 +26,8 @@ class Lexer {
     constructor(code) {
         this.code = code;
         this.length = this.code.length;
-        this.index = 0 | 0;
-        this.column = 1 | 0;
+        this.index = 0;
+        this.column = 1;
         this.tokens = [];
     }
 
@@ -109,15 +111,36 @@ class Lexer {
             }
         }
 
+        let loc = this.loc(this.index - value.length - 1, this.index - 1);
+
+        if (value == 'Infinity') {
+            return {
+                type: 'number',
+                value: Infinity,
+                loc
+            };
+        } else if (value == 'NaN') {
+            return {
+                type: 'number',
+                value: NaN,
+                loc
+            };
+        }
+
         return {
-            type: 'identifier',
+            type: reversedWords.includes(value) ? 'reversed' : 'identifier',
             value,
-            loc: this.loc(this.index - value.length - 1, this.index - 1)
+            loc
         };
     }
 
     number() {
         let str = '';
+
+        if (this.at() == '-') {
+            str += '-';
+            this.index += 1;
+        }
 
         while (true) {
             if (this.eof()) break;
@@ -131,7 +154,9 @@ class Lexer {
             }
         }
 
-        if (str) {
+        if (str == '.' || str == '-') {
+            this.index -= 1;
+        } else if (str) {
             return {
                 type: 'number',
                 value: Number(str),
@@ -256,11 +281,39 @@ class Lexer {
         }
     }
 
+    paren() {
+        let char = this.at();
+
+        if (char != '(' && char != ')' && char != '{' && char != '}' && char != '[' && char != ']') return;
+        this.index += 1;
+
+        return {
+            type: 'paren',
+            value: char,
+            loc: this.loc(this.index - 1, this.index - 1)
+        };
+    }
+
+    syntax() {
+        let char = this.at();
+
+        if (char != '.' && char != ',' && char != ';' && char != ':' && char != '?') return;
+        this.index += 1;
+
+        return {
+            type: 'syntax',
+            value: char,
+            loc: this.loc(this.index - 1, this.index - 1)
+        };
+    }
+
     next() {
         let t;
         t ||= this.whitespace();
-        t ||= this.identifier();
+        t ||= this.syntax();
+        t ||= this.paren();
         t ||= this.number();
+        t ||= this.identifier();
         t ||= this.string();
         t ||= this.boolean();
         t ||= this.regex();
@@ -277,7 +330,7 @@ class Lexer {
                 this.tokens.push(tk);
                 lock = 0;
             } else if (++lock > 1000) {
-                throw new Error('Lexer stuck');
+                throw new Error('Lexer stuck at character ' + this.at() + ' at index ' + this.index);
             }
         }
     }

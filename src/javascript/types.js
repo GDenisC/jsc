@@ -43,6 +43,11 @@ export function UndefinedLiteral(loc) {
     return { type: 'UndefinedLiteral', loc };
 }
 
+/** `void` */
+export function VoidLiteral(loc) {
+    return { type: 'VoidLiteral', loc };
+}
+
 // Expressions
 
 /** `[_w][_wn]` */
@@ -110,7 +115,43 @@ export function YieldExpression(argument, loc) {
     return { type: 'YieldExpression', argument, loc };
 }
 
+/** typeof {expression} */
+export function TypeofExpression(expression, loc) {
+    return { type: 'TypeofExpression', expression, loc };
+}
+
+/** `{left} instanceof {right}` */
+export function InstanceofExpression(left, right, loc) {
+    return { type: 'InstanceofExpression', left, right, loc };
+}
+
+/** `delete {expression}` */
+export function DeleteExpression(expression, loc) {
+    return { type: 'DeleteExpression', expression, loc };
+}
+
+/** `{left} as {right}` */
+export function AsExpression(left, right, loc) {
+    return { type: 'AsExpression', left, right, loc };
+}
+
 // Statements
+
+/**
+ * - `import {moduleName}`
+ * - `import {exports} from {moduleName}`
+ * @param {} defaultExport can be `AsExpression`, but `* as ..., { ... }` is not allowed
+ * @param {} exports is an array of `AsExpression` | `Identifier`
+ * @see https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Statements/import
+ * */
+export function ImportStatement(defaultExport, exports, moduleName, loc) {
+    return { type: 'ImportStatement', defaultExport, exports, moduleName, loc };
+}
+
+/** `export {expression}` | `export default {expression}` */
+export function ExportStatement(expression, isDefault, loc) {
+    return { type: 'ExportStatement', expression, isDefault, loc };
+}
 
 /** `;` */
 export function SemicolonStatement(loc) {

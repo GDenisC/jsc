@@ -6,8 +6,8 @@ const LITERALS = [
     '-NaN;',
     '"foo";',
     "'bar';",
-    '"\"";',
-    '"\\";',
+    '"\\"";',
+    '"\\\\";',
     '/foo/;',
     '/bar/g;',
     '/baz/gi;',
@@ -95,10 +95,7 @@ const STATEMENTS = [
 import generate from './javascript/generator.js';
 import { types } from './javascript/index.js'
 
-let result;
-
-console.time('generating code');
-generate(types.CodeStatement([
+const statement = types.CodeStatement([
     types.FunctionDeclaration(
         null,
         [],
@@ -128,15 +125,24 @@ generate(types.CodeStatement([
         false,
         true
     )
-]));
-console.timeEnd('generating code');
+]);
 
-let code = '"\\""';
+console.time('generating code');
+generate(statement);
+console.timeEnd('generating code');
 
 import lex from './javascript/lexer.js';
 
-console.time('lexer')
-result = lex(code);
-console.timeEnd('lexer');
+console.time('lexer literals');
+lex(LITERALS.join(''));
+console.timeEnd('lexer literals');
 
-console.log(result);
+console.time('lexer expressions');
+lex(EXPRESSIONS.join(''));
+console.timeEnd('lexer expressions');
+
+console.time('lexer statements');
+lex(STATEMENTS.join(''));
+console.timeEnd('lexer statements');
+
+let result;
