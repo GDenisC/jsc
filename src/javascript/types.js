@@ -55,11 +55,6 @@ export function Identifier(name, loc) {
     return { type: 'Identifier', name, loc };
 }
 
-/** `this` */
-export function ThisExpression(loc) {
-    return { type: 'ThisExpression', loc };
-}
-
 /** `{left}{operator}{right}` | `{left}{operator}` | `{operator}{right}` */
 export function Operator(left, operator, right, loc) {
     return { type: 'Operator', left, operator, right, loc };

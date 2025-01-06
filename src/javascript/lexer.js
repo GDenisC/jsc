@@ -1,6 +1,6 @@
 import { Location } from './types.js';
 
-export const reversedWords = 'constructor as if while for let const var break else continue default switch of async function await yield instanceof export import in new try catch throw finally do typeof delete static class'.split(' ').reverse();
+export const reversedWords = 'constructor as if while for let const var break else continue default switch of async function await yield instanceof export import in new try catch finally do typeof delete static class'.split(' ').reverse();
 
 const operators = [
     '=', '+', '-', '*', '/', '%', '**',
@@ -74,7 +74,7 @@ class Lexer {
                         return {
                             type: 'operator',
                             value: str,
-                            loc: this.loc(this.index - str.length - 1, this.index - 1)
+                            loc: this.loc(this.index - str.length, this.index)
                         };
                     else
                         throw new Error('Unknown operator: ' + str);
@@ -111,7 +111,7 @@ class Lexer {
             }
         }
 
-        let loc = this.loc(this.index - value.length - 1, this.index - 1);
+        let loc = this.loc(this.index - value.length, this.index);
 
         if (value == 'Infinity') {
             return {
@@ -135,6 +135,8 @@ class Lexer {
     }
 
     number() {
+        if (this.eof()) return;
+
         let str = '';
 
         if (this.at() == '-') {
@@ -143,15 +145,17 @@ class Lexer {
         }
 
         while (true) {
-            if (this.eof()) break;
             let char = this.at(),
                 code = char.charCodeAt(0);
+
             if (char == '.' || (code >= code_0 && code <= code_9)) {
                 str += char;
                 this.index += 1;
             } else {
                 break;
             }
+
+            if (this.eof()) break;
         }
 
         if (str == '.' || str == '-') {
@@ -160,7 +164,7 @@ class Lexer {
             return {
                 type: 'number',
                 value: Number(str),
-                loc: this.loc(this.index - str.length - 1, this.index - 1)
+                loc: this.loc(this.index - str.length, this.index)
             };
         }
     }
@@ -191,12 +195,13 @@ class Lexer {
                 value += char;
             } else if (char == '\\') {
                 escape = true;
+                value += char;
             } else if (char == string) {
                 this.index += 1;
                 return {
                     type: 'string',
                     value,
-                    loc: this.loc(this.index - value.length - 2, this.index - 2)
+                    loc: this.loc(this.index - value.length - 1, this.index - 1)
                 };
             } else {
                 value += char;
@@ -210,9 +215,9 @@ class Lexer {
         let value;
 
         if (this.at() == 't' && this.at(1) == 'r' && this.at(2) == 'u' && this.at(3) == 'e') {
-            value = true;
+            value = 'true';
         } else if (this.at() == 'f' && this.at(1) == 'a' && this.at(2) == 'l' && this.at(3) == 's' && this.at(4) == 'e') {
-            value = false;
+            value = 'false';
         } else {
             return;
         }
@@ -221,8 +226,8 @@ class Lexer {
 
         return {
             type: 'boolean',
-            value,
-            loc: this.loc(this.index - value.length - 1, this.index - 1)
+            value: value == 'true',
+            loc: this.loc(this.index - value.length, this.index )
         };
     }
 
@@ -260,24 +265,22 @@ class Lexer {
             this.index += 1;
         }
 
-        let flag = '';
+        let flags = '';
 
-        while (true) {
-            if (this.eof()) break;
-
+        while (!this.eof()) {
             let char = this.at();
 
             if (char != 'g' && char != 'i' && char != 'm') break;
 
-            flag += char;
+            flags += char;
             this.index += 1;
         }
 
         return {
             type: 'regex',
             value,
-            flag,
-            loc: this.loc(this.index - value.length - 1, this.index - 1)
+            flags,
+            loc: this.loc(this.index - value.length, this.index)
         }
     }
 
@@ -290,7 +293,7 @@ class Lexer {
         return {
             type: 'paren',
             value: char,
-            loc: this.loc(this.index - 1, this.index - 1)
+            loc: this.loc(this.index , this.index)
         };
     }
 
@@ -303,19 +306,18 @@ class Lexer {
         return {
             type: 'syntax',
             value: char,
-            loc: this.loc(this.index - 1, this.index - 1)
+            loc: this.loc(this.index, this.index)
         };
     }
 
     next() {
-        let t;
-        t ||= this.whitespace();
+        let t = this.whitespace();
         t ||= this.syntax();
         t ||= this.paren();
         t ||= this.number();
+        t ||= this.boolean();
         t ||= this.identifier();
         t ||= this.string();
-        t ||= this.boolean();
         t ||= this.regex();
         t ||= this.operator();
         return t;
@@ -348,10 +350,8 @@ class Lexer {
     }
 }
 
-function lex(code) {
+export default function lex(code) {
     const lexer = new Lexer(code);
     lexer.start();
     return lexer.tokens;
 }
-
-export default lex;

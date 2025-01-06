@@ -16,13 +16,12 @@ function generate(type, noSemicolon) {
         case 'UndefinedLiteral': return 'undefined' + semicolon;
         case 'VoidLiteral': return 'void' + semicolon;
         case 'Identifier': return type.name + semicolon;
-        case 'ThisExpression': return 'this' + semicolon;
         case 'Operator': return (type.left ? generate(type.left, true) : '') + type.operator + (type.right ? generate(type.right, true) : '') + semicolon;
         case 'ParenExpression': return '(' + generate(type.expression, true) + ')' + semicolon;
         case 'MemberExpression': return generate(type.object, true) + '.' + generate(type.property, true) + semicolon;
         case 'ArrayExpression': return '[' + generateArray(type.elements, true).join(',') + ']' + semicolon;
         case 'CallExpression': return generate(type.callee, true) + '(' + generateArray(type.args, true).join(',') + ')' + semicolon;
-        case 'NewExpression': return 'new ' + generate(type.callee, true) + '(' + generateArray(type.args, true).join(',') + ')' + semicolon;
+        case 'NewExpression': return 'new ' + generate(type.callee, true) + (type.args ? '(' + generateArray(type.args, true).join(',') + ')' : '') + semicolon;
         case 'ObjectExpression': return '{' + generateArray(type.properties, true).join(',') + '}' + semicolon;
         case 'ObjectProperty': return generate(type.key, true) + ':' + generate(type.value, true);
         case 'TernaryExpression': return generate(type.consequent, true) + '?' + generate(type.alternate, true) + ':' + generate(type.test, true) + semicolon;

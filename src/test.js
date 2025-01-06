@@ -1,9 +1,11 @@
+import { lex, parse, generate, types } from './javascript/index.js';
+
 const LITERALS = [
     '1;',
     '3.14159;',
     '-1.5;',
     'Infinity;',
-    '-NaN;',
+    'NaN;',
     '"foo";',
     "'bar';",
     '"\\"";',
@@ -92,9 +94,6 @@ const STATEMENTS = [
     'class Foo { constructor(x, y, z) {} }'
 ];
 
-import generate from './javascript/generator.js';
-import { types } from './javascript/index.js'
-
 const statement = types.CodeStatement([
     types.FunctionDeclaration(
         null,
@@ -131,8 +130,6 @@ console.time('generating code');
 generate(statement);
 console.timeEnd('generating code');
 
-import lex from './javascript/lexer.js';
-
 console.time('lexer literals');
 lex(LITERALS.join(''));
 console.timeEnd('lexer literals');
@@ -146,3 +143,22 @@ lex(STATEMENTS.join(''));
 console.timeEnd('lexer statements');
 
 let result;
+
+let code = EXPRESSIONS.slice(20, 21).join('\n');
+
+let tokens = lex(code);
+
+console.log('--------------------- INPUT --------------------');
+console.log(code.split('\n').map((_, i) => `${i + 1}: ${code.split('\n')[i]}`).join('\n'));
+
+console.time('parser');
+result = parse(tokens);
+console.timeEnd('parser');
+
+import { inspect } from 'util';
+
+console.log('--------------------- AST ----------------------');
+console.log(inspect(result, { depth: null, colors: true }));
+
+console.log('--------------------- CODE ---------------------');
+console.log(generate(result));
