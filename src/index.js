@@ -1,32 +1,28 @@
-import { parse } from "@babel/parser";
-import traverse from "@babel/traverse";
+import classDestructuring from './transforms/class-destructuring.js';
 
+/*
 function generateUsableIdentifier (identifier) {
-	// assumes we have a magical `idenfifierAlreadyExists` function
-	if (!idenfifierAlreadyExists()) {
+	// assumes we have a magical `identifierAlreadyExists` function
+	if (!identifierAlreadyExists()) {
 		return identifier;
 	}
 
 	let i = 0, generated;
 	do {
 		generated = `${identifier}_${i}`;
-	} while (idenfifierAlreadyExists(generated));
+	} while (identifierAlreadyExists(generated));
 	return generated;
 }
+*/
 
-const plugin = function (babel) {
-	/** @type {import("@babel/types")} */
-	const t = babel.types;
+/** @param {import("@babel/core")} babel */
+const plugin = function (_babel, options = {}) {
+	let visitor = {};
 
-	return {
-		visitor: {
-			Function: {
-				enter (path) {
-					console.log(path);
-				}
-			}
-		}
-	};
+	if (options.classDestructing)
+		visitor = Object.assign(visitor, classDestructuring);
+
+	return { visitor };
 }
 
-export { plugin };
+export default plugin;
