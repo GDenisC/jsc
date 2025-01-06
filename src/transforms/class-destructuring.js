@@ -41,7 +41,7 @@ export default {
 					t.functionDeclaration(
 						t.identifier(name + '_' + method.key.name),
 						method.params,
-						method.body
+						method.body // TODO: transform this to self
 					)
 				);
 			}
