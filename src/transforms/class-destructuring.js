@@ -10,7 +10,7 @@
 
 import { types as t } from '@babel/core';
 
-/** @type {{ [className: string]: import('@babel/core').ClassMethod[] }} */
+/** @type {{ [className: string]: import('@babel/core').types.ClassMethod[] }} */
 const classes = {};
 
 export default {
@@ -25,10 +25,37 @@ export default {
 
 			path.traverse({
 				/** @param {import('@babel/core').NodePath} path */
-				ClassMethod(method) {
-					methods.push(method.node);
-				},
-			})
+				ClassMethod(path) {
+					let node = path.node;
+
+					if (node.kind != 'constructor' && !node.static) {
+						node.params.unshift(t.identifier('self'));
+					}
+
+					path.traverse({
+						/** @param {import('@babel/core').NodePath} path */
+						BlockStatement(path) {
+							if (node.kind == 'constructor') {
+								path.unshiftContainer('body',
+									t.variableDeclaration('var', [
+										t.variableDeclarator(
+											t.identifier('self'),
+											t.objectExpression([])
+										)
+									])
+								);
+								path.pushContainer('body', t.returnStatement(t.identifier('self')));
+							}
+						},
+						/** @param {import('@babel/core').NodePath} path */
+						ThisExpression(path) {
+							path.replaceWith(t.identifier('self'));
+						}
+					});
+
+					methods.push(node);
+				}
+			});
 
 			classes[path.node.id.name] = methods;
 		},
@@ -41,11 +68,56 @@ export default {
 					t.functionDeclaration(
 						t.identifier(name + '_' + method.key.name),
 						method.params,
-						method.body // TODO: transform this to self
+						method.body
 					)
 				);
 			}
 			path.remove();
 		}
 	},
+	/** @param {import('@babel/core').NodePath} path */
+	CallExpression(path) {
+		let name = path.node.callee.object?.callee?.name,
+			cls = classes[name];
+
+		if (!cls) return;
+
+		if (path.node.callee.object?.type == 'NewExpression') {
+			path.node.arguments.unshift(path.node.callee.object);
+		}
+
+		path.node.callee = t.identifier(name + '_' + path.node.callee.property.name);
+	},
+	/** @param {import('@babel/core').NodePath} path */
+	NewExpression(path) {
+		let name = path.node.callee.name,
+			cls = classes[name];
+
+		if (!cls) return;
+
+		path.replaceWith(
+			t.callExpression(
+				t.identifier(name + '_constructor'),
+				path.node.arguments
+			)
+		);
+
+		if (path.parentPath.type != 'VariableDeclarator') return;
+
+		const variableName = path.parentPath.node.id.name;
+
+		/**  VarDecl    VarDecls   Block     */
+		path.parentPath.parentPath.parentPath.traverse({
+			CallExpression(path) {
+				if (path.node.callee.object?.name != variableName) return;
+
+				path.replaceWith(
+					t.callExpression(
+						t.identifier(name + '_' + path.node.callee.property.name),
+						path.node.arguments
+					)
+				);
+			}
+		});
+	}
 }

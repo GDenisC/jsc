@@ -12,7 +12,8 @@ class Class {
 	}
 }
 
-new Class().hello(10);
+let x = new Class();
+console.log(x.hello(10));
 `.trim();
 
 console.log('------------ INPUT ------------');
