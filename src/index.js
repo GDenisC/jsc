@@ -1,4 +1,4 @@
-import classDestructuring from './transforms/class-destructuring.js';
+import { ClassDestructuring } from './transforms/class-destructuring.js';
 
 /*
 function generateUsableIdentifier (identifier) {
@@ -15,12 +15,13 @@ function generateUsableIdentifier (identifier) {
 }
 */
 
-/** @param {import("@babel/core")} babel */
 const plugin = function (_babel, options = {}) {
 	let visitor = {};
 
-	if (options.classDestructing)
-		visitor = Object.assign(visitor, classDestructuring);
+	if (options.classDestructuring) {
+		let classDestructuring = new ClassDestructuring();
+		visitor = Object.assign(visitor, classDestructuring.getVisitors());
+	}
 
 	return { visitor };
 }

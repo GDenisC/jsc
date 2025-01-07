@@ -10,17 +10,21 @@ class Class {
 	hello(a) {
 		return this.x + a;
 	}
+
+	static world() {
+		return 100;
+	}
 }
 
 let x = new Class();
-console.log(x.hello(10));
+console.log(x.hello(Class.world()));
 `.trim();
 
 console.log('------------ INPUT ------------');
 console.log(input);
 
 const result = babel.transformSync(input, {
-	plugins: [[plugin, { classDestructing: true }]]
+	plugins: [[plugin, { classDestructuring: true }]]
 });
 
 console.log('------------ OUTPUT -----------');
