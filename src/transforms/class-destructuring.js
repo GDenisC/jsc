@@ -111,6 +111,8 @@ export default {
 			CallExpression(path) {
 				if (path.node.callee.object?.name != variableName) return;
 
+				path.node.arguments.unshift(t.identifier(variableName));
+
 				path.replaceWith(
 					t.callExpression(
 						t.identifier(name + '_' + path.node.callee.property.name),
