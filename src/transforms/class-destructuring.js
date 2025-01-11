@@ -7,7 +7,7 @@ import { types as t } from '@babel/core';
  *
  * ### TODO:
  * 1. simplify `const/let Name = class { ETC }` into `class Name { ETC }`
- * 2. setters and getters must be converted from assignments and gets(proper term?) into function calls, since they're functions
+ * 2. references to setters and getters as attributes must be converted into function calls
  * do all of the above, in that order
  *  */
 export class ClassDestructuring {
