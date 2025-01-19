@@ -64,7 +64,7 @@ export class ClassDestructuring {
 				}
 			});
 
-			path.insertBefore(
+			path.parentPath.parentPath.insertBefore(
 				t.functionDeclaration(
 					t.identifier(self.addMethodName(name, node)),
 					node.params,
