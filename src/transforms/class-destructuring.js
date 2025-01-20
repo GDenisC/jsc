@@ -9,7 +9,8 @@ import { types as t } from '@babel/core';
  * 1. simplify `const/let Name = class { ETC }` into `class Name { ETC }`
  * 2. setters and getters must be converted from assignments and gets(proper term?) into function calls, since they're functions
  * do all of the above, in that order
- *  */
+ *
+ */
 export class ClassDestructuring {
 	constructor() {
 		this.classes = {};
@@ -85,7 +86,7 @@ export class ClassDestructuring {
 
 	/** @param {import('@babel/core').NodePath} path */
 	onCallExpression(path) {
-		let name = path.node.callee.object?.callee?.name,
+		let name = path.node.callee.object?.name,
 			cls = this.classes[name];
 
 		if (!cls) return;
