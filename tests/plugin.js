@@ -2,15 +2,27 @@ import babel from '@babel/core';
 import plugin from '../src/index.js';
 
 const input = `
-class Keys {
-	static master = "Hello, World";
+class Vault {
+	#data;
+	constructor(data) {
+		this.#data = data;
+	}
 
-	static getMaster() {
-		return Keys.master;
+	isVault() {
+		return true;
+	}
+
+	get value() {
+		return this.#data;
 	}
 }
 
-console.log(Keys.master, Keys.getMaster());
+let vault = new Vault(123);
+
+vault.isVault();
+
+console.log(vault.value);
+
 `.trim();
 
 console.log('------------ INPUT ------------');
