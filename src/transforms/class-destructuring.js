@@ -1,7 +1,9 @@
 import { types as t } from '@babel/core';
 
+const properties = Symbol('properties');
+
 /**
- * function name template: {classname}[_static][_(get|set)][_private]_{property}
+ * function name template: `{classname}[_static][_(get|set)][_private]_{property}`
  *
  * only work with top-level classes
  *
@@ -14,7 +16,8 @@ import { types as t } from '@babel/core';
 export class ClassDestructuring {
 	constructor(options) {
 		this.options = Object.assign({
-			prefix: ''
+			prefix: '',
+			mangleProperties: false
 		}, options);
 		this.classes = {};
 	}
@@ -44,7 +47,7 @@ export class ClassDestructuring {
 		let name = path.node.id.name,
 			self = this; // babel skill issue
 
-		self.classes[name] = {};
+		self.classes[name] = { [properties]: [] };
 
 		/** @param {import('@babel/core').NodePath<t.ClassMethod | t.ClassPrivateMethod>} path */
 		function onClassMethod(path) {
@@ -74,6 +77,30 @@ export class ClassDestructuring {
 				},
 				PrivateName(path) {
 					path.replaceWith(t.identifier('private_' + path.node.id.name));
+				}
+			});
+
+			if (self.options.mangleProperties) path.traverse({
+				ExpressionStatement(path) {
+					let expression = path.node.expression;
+					if (!t.isAssignmentExpression(expression) || expression.operator != '=') return;
+					let member = expression.left;
+					if (!t.isMemberExpression(member)) return;
+					if (member.object.name != 'self') return;
+					let id = member.property;
+					if (!t.isIdentifier(id)) return;
+
+					let classProps = self.classes[name][properties],
+						index = classProps.indexOf(id.name);
+
+					if (index == -1) index = classProps.push(id.name) - 1;
+
+					path.node.expression.left.property = t.numericLiteral(index);
+				},
+				MemberExpression(path) {
+					let prop = path.node.property;
+					if (!t.isIdentifier(prop)) return;
+					path.node.property = t.numericLiteral(self.classes[name][properties].indexOf(prop.name))
 				}
 			});
 
@@ -183,8 +210,11 @@ export class ClassDestructuring {
 
 				let methodName = self.getClassMethod(className, false, path.node.property.name);
 
-				if (!methodName)
-					throw new Error('Unknown method of ' + className + ' declared as ' + variableName);
+				if (!methodName) {
+					if (!self.options.mangleProperties) return;
+					path.node.property = t.numericLiteral(self.classes[className][properties].indexOf(path.node.property.name));
+					return;
+				}
 
 				path.replaceWith(
 					t.callExpression(
