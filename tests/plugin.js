@@ -29,7 +29,9 @@ console.log('------------ INPUT ------------');
 console.log(input.replaceAll('\t', '  '));
 
 const result = babel.transformSync(input, {
-	plugins: [[plugin, { classDestructuring: true }]]
+	plugins: [[plugin, { classDestructuring: {
+		prefix: 'mangled_'
+	} }]]
 });
 
 console.log('------------ OUTPUT -----------');

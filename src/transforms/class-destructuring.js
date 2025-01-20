@@ -12,7 +12,10 @@ import { types as t } from '@babel/core';
  * 3. fix `self.{method}(...)`
  */
 export class ClassDestructuring {
-	constructor() {
+	constructor(options) {
+		this.options = Object.assign({
+			prefix: ''
+		}, options);
 		this.classes = {};
 	}
 
@@ -136,11 +139,12 @@ export class ClassDestructuring {
 	/** @param {import('@babel/core').NodePath} path */
 	onNewExpression(path) {
 		let className = path.node.callee.name,
+			classConstructor = this.getClassMethod(className, false, 'constructor'),
 			self = this;
 
 		path.replaceWith(
 			t.callExpression(
-				t.identifier(className + '_constructor'),
+				t.identifier(classConstructor),
 				path.node.arguments
 			)
 		);
@@ -167,7 +171,7 @@ export class ClassDestructuring {
 
 				path.replaceWith(
 					t.callExpression(
-						t.identifier(className + '_' + path.node.callee.property.name),
+						t.identifier(methodName),
 						[t.identifier(variableName), ...path.node.arguments]
 					)
 				);
@@ -184,7 +188,7 @@ export class ClassDestructuring {
 
 				path.replaceWith(
 					t.callExpression(
-						t.identifier(className + '_' + path.node.property.name),
+						t.identifier(methodName),
 						[t.identifier(variableName)]
 					)
 				);
@@ -215,7 +219,7 @@ export class ClassDestructuring {
 		if (node.kind == 'set') name += '_set';
 		if (node.key.type == 'PrivateName') name += '_private';
 		name += '_' + node.key.name;
-		return name;
+		return this.options.prefix + name;
 	}
 
 	addClassMethod(className, node) {

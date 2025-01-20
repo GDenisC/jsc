@@ -19,7 +19,7 @@ const plugin = function (_babel, options = {}) {
 	let visitor = {};
 
 	if (options.classDestructuring) {
-		let classDestructuring = new ClassDestructuring();
+		let classDestructuring = new ClassDestructuring(options.classDestructuring);
 		visitor = Object.assign(visitor, classDestructuring.getVisitors());
 	}
 
