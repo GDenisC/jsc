@@ -212,9 +212,9 @@ console.log(reg0);
 
 # Checklist
 
-- [ ] JavaScript reader
+- [x] JavaScript reader - babel
 
-- [ ] Class Destructuring
+- [ ] Class Destructuring (WIP)
 
 - [ ] Precalculation
 
