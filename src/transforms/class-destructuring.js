@@ -2,8 +2,6 @@ import core, { types as t } from '@babel/core';
 import { setOptions } from './destructuring/options.js';
 import { ClassMap } from './destructuring/naming.js';
 
-const properties = Symbol('properties');
-
 /**
  * function name template: `{classname}[_static][_(get|set)][_private]_{property}`
  *
@@ -43,7 +41,7 @@ export class ClassDestructuring {
 			throw new Error('Classes must be top-level');
 		}
 
-		let name = path.node.id.name,
+		let className = path.node.id.name,
 			options = this.options,
 			classes = this.classes; // babel skill issue
 
@@ -87,24 +85,19 @@ export class ClassDestructuring {
 					if (member.object.name != 'self') return;
 					let id = member.property;
 					if (!t.isIdentifier(id)) return;
-
-					let classProps = self.classes[name][properties],
-						index = classProps.indexOf(id.name);
-
-					if (index == -1) index = classProps.push(id.name) - 1;
-
+					let index = classes.getOrAddPropertyIndex(className, id.name);
 					path.node.expression.left.property = t.numericLiteral(index);
 				},
 				MemberExpression(path) {
 					let prop = path.node.property;
 					if (!t.isIdentifier(prop)) return;
-					path.node.property = t.numericLiteral(self.classes[name][properties].indexOf(prop.name))
+					path.node.property = t.numericLiteral(classes.getPropertyIndex(className, prop.name))
 				}
 			});
 
 			path.parentPath.parentPath.insertBefore(
 				t.functionDeclaration(
-					t.identifier(classes.add(name, node)),
+					t.identifier(classes.add(className, node)),
 					node.params,
 					node.body,
 					node.generator,
@@ -127,7 +120,7 @@ export class ClassDestructuring {
 				t.variableDeclaration(
 					'var',
 					[t.variableDeclarator(
-						t.identifier(self.addClassProperty(name, node)),
+						t.identifier(self.addClassProperty(className, node)),
 						node.value
 					)]
 				)

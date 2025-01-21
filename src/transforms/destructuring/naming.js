@@ -30,7 +30,7 @@ const generateClassName = function(prefix, className, node, debug = false) {
         console.log(
             'Trying to generate class name: '
             + prefix + name + ' '
-            + JSON.stringify({ isMethod, isPrivateMethod, isProperty, isPrivateProperty })
+            + util.inspect({ isMethod, isPrivateMethod, isProperty, isPrivateProperty }, { compact: true, colors: true }).replaceAll('\n', '').replaceAll('  ', ' ')
         );
     }
 
@@ -144,7 +144,7 @@ export class ClassMap {
             throw new Error('addProperty should not be called here')
 
         if (!this.#classes[className])
-            raise('Unknown class: ' + className);
+            this.#classes[className] = { [properties]: [] };
 
         return this.#classes[className][properties].push(property) - 1;
     }
@@ -158,6 +158,18 @@ export class ClassMap {
 
         let index = this.#classes[className][properties].indexOf(property);
 
-        return index == -1 ? null : index;
+        return index == -1 ? raise('Unknown property: ' + property) : index;
+    }
+
+    getOrAddPropertyIndex(className, property) {
+        if (!this.options.mangleProperties)
+            throw new Error('getOrAddPropertyIndex should not be called here')
+
+        if (!this.#classes[className])
+            this.#classes[className] = { [properties]: [] };
+
+        let index = this.#classes[className][properties].indexOf(property);
+
+        return index == -1 ? this.#classes[className][properties].push(property) - 1 : index;
     }
 }

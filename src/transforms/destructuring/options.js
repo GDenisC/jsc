@@ -9,5 +9,5 @@ const defaultOptions = {
  * @returns {typeof defaultOptions}
  */
 export const setOptions = function(options) {
-    return Object.assign(options, defaultOptions);
+    return Object.assign(defaultOptions, options);
 }
