@@ -124,19 +124,37 @@ Math.floor(Math.random() * 20);
 ## `@macro`
 
 ```js
-/** @macro */
-const PI = 3.14;
-
-/** @macro */
-function LOG(a) {
-    console.log(a);
+//@macro if DEBUG
+function log(message) {
+    console.log(message);
 }
+//@macro else
+function log(_) {}
+//@macro endif
 
-LOG(PI);
+log('Hello!');
 ```
 
+> ```js
+> //@macro set DEBUG 1
+> ```
+
 ```js
-console.log(3.14);
+function log(message) {
+    console.log(message);
+}
+
+log('Hello!');
+```
+
+> ```js
+> //@macro set DEBUG 1
+> ```
+
+```js
+function log(_) {}
+
+log('Hello!');
 ```
 
 ## `@const`
