@@ -8,10 +8,6 @@ class Vault {
 		this.#data = data;
 	}
 
-	isVault() {
-		return true;
-	}
-
 	get value() {
 		return this.#data;
 	}
@@ -19,17 +15,14 @@ class Vault {
 
 let vault = new Vault(123);
 
-vault.isVault();
-
-console.log(vault.value);
-
+vault.value;
 `.trim();
 
 console.log('------------ INPUT ------------');
 console.log(input.replaceAll('\t', '  '));
 
 const result = babel.transformSync(input, {
-	plugins: [[plugin, { classDestructuring: {} }]]
+	plugins: [[plugin, { classDestructuring: { debug: true } }]]
 });
 
 console.log('------------ OUTPUT -----------');

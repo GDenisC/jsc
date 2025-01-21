@@ -1,4 +1,6 @@
-import { types as t } from '@babel/core';
+import core, { types as t } from '@babel/core';
+import { setOptions } from './destructuring/options.js';
+import { ClassMap } from './destructuring/naming.js';
 
 const properties = Symbol('properties');
 
@@ -15,11 +17,8 @@ const properties = Symbol('properties');
  */
 export class ClassDestructuring {
 	constructor(options) {
-		this.options = Object.assign({
-			prefix: '',
-			mangleProperties: false
-		}, options);
-		this.classes = {};
+		this.options = setOptions(options);
+		this.classes = new ClassMap(this.options);
 	}
 
 	getVisitors() {
@@ -28,28 +27,27 @@ export class ClassDestructuring {
 			CallExpression: this.onCallExpression.bind(this),
 			NewExpression: this.onNewExpression.bind(this),
 			MemberExpression: this.onMemberExpression.bind(this)
-		}
+		};
 	}
 
-	/** @param {import('@babel/core').NodePath<t.ClassExpression>} path */
+	/** @param {core.NodePath<t.ClassExpression>} path */
 	onClassExpression(path) {
 		let decl = path.parentPath,
 			decls = decl.parentPath;
 		throw new Error('Class expressions like "' + decls.node.kind + ' ' + decl.node.id.name + ' = class { ... }" not supported');
 	}
 
-	/** @param {import('@babel/core').NodePath} path */
+	/** @param {core.NodePath} path */
 	onClassDeclaration(path) {
 		if (path.parentPath.node.type != 'Program') {
 			throw new Error('Classes must be top-level');
 		}
 
 		let name = path.node.id.name,
-			self = this; // babel skill issue
+			options = this.options,
+			classes = this.classes; // babel skill issue
 
-		self.classes[name] = { [properties]: [] };
-
-		/** @param {import('@babel/core').NodePath<t.ClassMethod | t.ClassPrivateMethod>} path */
+		/** @param {core.NodePath<t.ClassMethod | t.ClassPrivateMethod>} path */
 		function onClassMethod(path) {
 			let node = path.node;
 
@@ -80,7 +78,7 @@ export class ClassDestructuring {
 				}
 			});
 
-			if (self.options.mangleProperties) path.traverse({
+			if (options.mangleProperties) path.traverse({
 				ExpressionStatement(path) {
 					let expression = path.node.expression;
 					if (!t.isAssignmentExpression(expression) || expression.operator != '=') return;
@@ -106,7 +104,7 @@ export class ClassDestructuring {
 
 			path.parentPath.parentPath.insertBefore(
 				t.functionDeclaration(
-					t.identifier(self.addClassMethod(name, node)),
+					t.identifier(classes.add(name, node)),
 					node.params,
 					node.body,
 					node.generator,
@@ -115,7 +113,7 @@ export class ClassDestructuring {
 			);
 		}
 
-		/** @param {import('@babel/core').NodePath<t.ClassProperty | t.ClassPrivateProperty>} path */
+		/** @param {core.NodePath<t.ClassProperty | t.ClassPrivateProperty>} path */
 		function onClassProperty(path) {
 			let node = path.node;
 
@@ -146,13 +144,15 @@ export class ClassDestructuring {
 		path.remove();
 	}
 
-	/** @param {import('@babel/core').NodePath} path */
+	/** @param {core.NodePath<t.CallExpression>} path */
 	onCallExpression(path) {
+		if (t.isIdentifier(path.node.callee)) return
+
 		// Identifier || CallExpression
 		let name = path.node.callee.object?.name || path.node.callee.object?.callee.name,
 			prop = path.node.callee?.property?.name,
-			method = this.getClassMethod(name, false, prop),
-			staticMethod = this.getClassMethod(name, true, prop);
+			method = this.classes.getInstanceMethod(name, prop),
+			staticMethod = this.classes.getStaticMethod(name, prop);
 
 		if (!method && !staticMethod) return;
 
@@ -163,11 +163,12 @@ export class ClassDestructuring {
 		path.node.callee = t.identifier(method || staticMethod);
 	}
 
-	/** @param {import('@babel/core').NodePath} path */
+	/** @param {core.NodePath} path */
 	onNewExpression(path) {
 		let className = path.node.callee.name,
-			classConstructor = this.getClassMethod(className, false, 'constructor'),
-			self = this;
+			classConstructor = this.classes.getInstanceMethod(className, 'constructor'),
+			classes = this.classes,
+			options = this.options;
 
 		path.replaceWith(
 			t.callExpression(
@@ -191,7 +192,7 @@ export class ClassDestructuring {
 
 				// instance methods
 
-				let methodName = self.getClassMethod(className, false, path.node.callee.property.name);
+				let methodName = classes.getInstanceMethod(className, path.node.callee.property.name);
 
 				if (!methodName)
 					throw new Error('Unknown method of ' + className + ' declared as ' + variableName);
@@ -208,11 +209,11 @@ export class ClassDestructuring {
 
 				// getters and setters
 
-				let methodName = self.getClassMethod(className, false, path.node.property.name);
+				let methodName = classes.getInstanceMethod(className, path.node.property.name);
 
 				if (!methodName) {
-					if (!self.options.mangleProperties) return;
-					path.node.property = t.numericLiteral(self.classes[className][properties].indexOf(path.node.property.name));
+					if (!options.mangleProperties) return;
+					path.node.property = t.numericLiteral(classes[className][properties].indexOf(path.node.property.name));
 					return;
 				}
 
@@ -226,59 +227,18 @@ export class ClassDestructuring {
 		});
 	}
 
-	/** @param {import('@babel/core').NodePath<t.MemberExpression>} path */
+	/** @param {core.NodePath<t.MemberExpression>} path */
 	onMemberExpression(path) {
 		let object = path.node.object,
 			property = path.node.property;
 
 		// transform static properties
-		if (t.isIdentifier(object) && t.isIdentifier(property)) {
-			let classProperty = this.getClassProperty(object.name, true, property.name);
+		if (t.isIdentifier(object) && t.isIdentifier(property) && object.name != 'self') {
+			let classProperty = this.classes.getStaticProperty(object.name, property.name);
 
 			if (!classProperty) return;
 
 			path.replaceWith(t.identifier(classProperty));
 		}
-	}
-
-	/** @param {t.ClassMethod} node */
-	getClassName(className, node) {
-		let name = className;
-		if (node.static) name += '_static';
-		if (node.kind == 'get') name += '_get';
-		if (node.kind == 'set') name += '_set';
-		if (node.key.type == 'PrivateName') name += '_private';
-		name += '_' + node.key.name;
-		return this.options.prefix + name;
-	}
-
-	addClassMethod(className, node) {
-		let name = this.getClassName(className, node),
-			s = node.static ? 's' : '';
-		this.classes[className][s + 'm_' + node.key.name] = name;
-		return name;
-	}
-
-	addClassProperty(className, node) {
-		let name = this.getClassName(className, node),
-			s = node.static ? 's' : '';
-		this.classes[className][s + 'p_' + node.key.name] = name;
-		return name;
-	}
-
-	getClassMethod(className, isStatic, name) {
-		if (!name) return;
-		let cls = this.classes[className];
-		if (!cls) return;
-		let s = isStatic ? 's' : '';
-		return cls[s + 'm' + '_' + name];
-	}
-
-	getClassProperty(className, isStatic, name) {
-		if (!name) return;
-		let cls = this.classes[className];
-		if (!cls) return;
-		let s = isStatic ? 's' : '';
-		return cls[s + 'p' + '_' + name];
 	}
 }
