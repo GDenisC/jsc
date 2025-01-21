@@ -1,12 +1,15 @@
 # JavaScript Compiler
 
-## Class Destructuring
+## [Class Destructuring](https://github.com/GDenisC/jsc/issues/1)
+
 Converts a Class declaration into a series of equivalent function declarations.
 Only works with top-level classes.
+
 - V8 optimizations
 - Better code compression results
 
 ### Example 1
+
 ```js
 class Foo {
     constructor() {
@@ -20,6 +23,7 @@ class Foo {
 
 console.log(new Foo().x);
 ```
+
 ```js
 function Foo_constructor() {
     /* or just return { x: 1 } */
@@ -36,6 +40,7 @@ console.log(Foo_get_x(Foo_constructor()));
 ```
 
 ### Example 2
+
 ```js
 class Foo {
     getHelloString() {
@@ -51,6 +56,7 @@ class Bar extends Foo {
 
 console.log(new Bar().getHelloString());
 ```
+
 ```js
 function Foo_getHelloString(self) {
     return 'hello';
@@ -69,6 +75,7 @@ function foo(x) {
     return Math.sqrt(x * x + x * x) + 60 * 2 - 20;
 }
 ```
+
 ```js
 function foo(x) {
     var _0 = x * x;
@@ -77,6 +84,7 @@ function foo(x) {
 ```
 
 ## Unglobalization
+
 - Patches some hooking techniques (replacing a function/method with a malicious clone)
 - Better code compression results
 
@@ -85,6 +93,7 @@ function randomInt(x) {
     return Math.floor(Math.random() * x);
 }
 ```
+
 ```js
 var Math_floor = Math.floor,
     Math_random = Math.random;
@@ -94,6 +103,7 @@ function randomInt(x) {
 ```
 
 ## `@inline`
+
 functions and class methods
 
 ```js
@@ -105,6 +115,7 @@ function randomInt(x) {
 randomInt(10);
 randomInt(20);
 ```
+
 ```js
 Math.floor(Math.random() * 10);
 Math.floor(Math.random() * 20);
@@ -123,11 +134,13 @@ function LOG(a) {
 
 LOG(PI);
 ```
+
 ```js
 console.log(3.14);
 ```
 
 ## `@const`
+
 Variable that will be evaluated at compile time
 
 ```js
@@ -142,13 +155,17 @@ const WORD = (() => {
 
 console.log(WORD + ARR[2] * ARR[3]);
 ```
+
 if i run the program 3 times:
+
 ```js
 console.log('answer is ' + 100 * 1000);
 ```
+
 ```js
 console.log('answer = ' + 100 * 1000);
 ```
+
 ```js
 console.log('hello, ' + 100 * 1000);
 ```
@@ -162,6 +179,7 @@ function random(min, max) {
 
 console.log(random(10, 20));
 ```
+
 ```js
 var __stack = [];
 function random() {
@@ -174,6 +192,7 @@ console.log(__stack.pop());
 ```
 
 ## Registers
+
 Recursion is not supported
 
 ```js
@@ -183,6 +202,7 @@ function random(min, max) {
 
 console.log(random(10, 20));
 ```
+
 ```js
 var reg0, reg1;
 function random() {
@@ -196,25 +216,28 @@ console.log(reg0);
 ```
 
 ## Bytecode build
+
 - less size
 - can be slower than js
 - fast build
 
 ## ASM.js build
+
 - more size
 - a bit faster than js
 - fast build
 
 ## WASM build
+
 - less size
 - much faster than js
 - slow build
 
-# Checklist
+## Checklist
 
 - [x] JavaScript reader - babel
 
-- [ ] Class Destructuring (WIP)
+- [ ] [Class Destructuring (WIP)](https://github.com/GDenisC/jsc/issues/1)
 
 - [ ] Precalculation
 
