@@ -57,7 +57,7 @@ export class ClassDestructuring {
 				BlockStatement(path) {
 					if (node.kind == 'constructor') {
 						path.unshiftContainer('body',
-							t.variableDeclaration('var', [
+							t.variableDeclaration(options.variableKind, [
 								t.variableDeclarator(
 									t.identifier('self'),
 									t.objectExpression([])
@@ -117,7 +117,7 @@ export class ClassDestructuring {
 
 			path.parentPath.parentPath.insertBefore(
 				t.variableDeclaration(
-					'var',
+					options.variableKind,
 					[t.variableDeclarator(
 						t.identifier(self.addClassProperty(className, node)),
 						node.value
