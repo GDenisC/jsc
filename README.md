@@ -174,7 +174,7 @@ log('Hello!');
 ```
 
 > ```js
-> //@macro set DEBUG 1
+> //@macro set DEBUG 0
 > ```
 
 ```js
