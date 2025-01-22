@@ -42,7 +42,8 @@ export class ClassDestructuring {
 
 		let className = path.node.id.name,
 			options = this.options,
-			classes = this.classes; // babel skill issue
+			classes = this.classes,
+			self = this; // babel skill issue
 
 		/** @param {core.NodePath<t.ClassMethod | t.ClassPrivateMethod>} path */
 		function onClassMethod(path) {
@@ -119,7 +120,7 @@ export class ClassDestructuring {
 				t.variableDeclaration(
 					options.variableKind,
 					[t.variableDeclarator(
-						t.identifier(self.addClassProperty(className, node)),
+						t.identifier(classes.add(className, node)),
 						node.value
 					)]
 				)

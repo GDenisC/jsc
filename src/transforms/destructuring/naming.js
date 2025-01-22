@@ -70,7 +70,7 @@ export class ClassMap {
 
     /** @param {AnyClassProperty} node */
     #addProperty(className, node) {
-        raise('addProperty:\n' + util.inspect(node, false, null, true));
+        raise('TODO: addProperty:\n' + util.inspect(node, false, null, true));
     }
 
     /** @param {AnyClassNode} node */
