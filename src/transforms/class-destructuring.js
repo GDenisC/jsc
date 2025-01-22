@@ -1,6 +1,7 @@
 import core, { types as t } from '@babel/core';
 import { setOptions } from './destructuring/options.js';
 import { ClassMap } from './destructuring/naming.js';
+import { transformClassExpression } from './destructuring/transforms.js';
 
 /**
  * function name template: `{classname}[_static][_(get|set)][_private]_{property}`
@@ -8,10 +9,9 @@ import { ClassMap } from './destructuring/naming.js';
  * only work with top-level classes
  *
  * ### TODO:
- * 1. simplify `const/let Name = class { ETC }` into `class Name { ETC }`
- * 2. setters and getters must be converted from assignments and gets(proper term?) into function calls, since they're functions
+ * 1. setters and getters must be converted from assignments and gets(proper term?) into function calls, since they're functions
+ * 2. fix `self.{method}(...)`
  * do all of the above, in that order
- * 3. fix `self.{method}(...)`
  */
 export class ClassDestructuring {
 	constructor(options) {
@@ -21,6 +21,7 @@ export class ClassDestructuring {
 
 	getVisitors() {
 		return {
+			ClassExpression: this.onClassExpression.bind(this),
 			ClassDeclaration: this.onClassDeclaration.bind(this),
 			CallExpression: this.onCallExpression.bind(this),
 			NewExpression: this.onNewExpression.bind(this),
@@ -30,14 +31,12 @@ export class ClassDestructuring {
 
 	/** @param {core.NodePath<t.ClassExpression>} path */
 	onClassExpression(path) {
-		let decl = path.parentPath,
-			decls = decl.parentPath;
-		throw new Error('Class expressions like "' + decls.node.kind + ' ' + decl.node.id.name + ' = class { ... }" not supported');
+		this.onClassDeclaration(transformClassExpression(path));
 	}
 
 	/** @param {core.NodePath} path */
 	onClassDeclaration(path) {
-		if (path.parentPath.node.type != 'Program') {
+		if (path.parent.type != 'Program') {
 			throw new Error('Classes must be top-level');
 		}
 

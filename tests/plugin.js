@@ -2,20 +2,9 @@ import babel from '@babel/core';
 import plugin from '../src/index.js';
 
 const input = `
-class Vault {
-	#data;
-	constructor(data) {
-		this.#data = data;
-	}
-
-	get value() {
-		return this.#data;
-	}
-}
-
-let vault = new Vault(123);
-
-vault.value;
+var Class = class {
+	constructor() {}
+};
 `.trim();
 
 console.log('------------ INPUT ------------');
