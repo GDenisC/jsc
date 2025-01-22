@@ -1,5 +1,31 @@
 # JavaScript Compiler
 
+## Checklist
+
+- [x] JavaScript reader - babel
+
+- [ ] [Class Destructuring (WIP)](https://github.com/GDenisC/jsc/issues/1)
+
+- [ ] Precalculation
+
+- [ ] Unglobalization
+
+- [ ] `@inline`
+
+- [ ] `@macro`
+
+- [ ] `@const`
+
+- [ ] Stack
+
+- [ ] Registers
+
+- [ ] Bytecode
+
+- [ ] ASM.js
+
+- [ ] WASM
+
 ## [Class Destructuring](https://github.com/GDenisC/jsc/issues/1)
 
 Converts a Class declaration into a series of equivalent function declarations.
@@ -250,29 +276,3 @@ console.log(reg0);
 - less size
 - much faster than js
 - slow build
-
-## Checklist
-
-- [x] JavaScript reader - babel
-
-- [ ] [Class Destructuring (WIP)](https://github.com/GDenisC/jsc/issues/1)
-
-- [ ] Precalculation
-
-- [ ] Unglobalization
-
-- [ ] `@inline`
-
-- [ ] `@macro`
-
-- [ ] `@const`
-
-- [ ] Stack
-
-- [ ] Registers
-
-- [ ] Bytecode
-
-- [ ] ASM.js
-
-- [ ] WASM
