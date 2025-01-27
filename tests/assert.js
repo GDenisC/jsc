@@ -4,13 +4,10 @@ import plugin from '../src/index.js';
 const reset = '\x1b[0m';
 
 const bRed = '\x1b[41m';
-const bGreen = '\x1b[42m';
-
-const fBlack = '\x1b[30m';
-const fWhite = '\x1b[37m';
 const fYellow = '\x1b[33m';
 
-let testUniqueId = 0;
+export let lastTestId = 0;
+let errorWasShowed = false;
 
 function deepStrictEqual(actual, expected) {
     switch (typeof actual) {
@@ -36,6 +33,8 @@ function deepStrictEqual(actual, expected) {
         return true;
     }
 
+    if (actual == null || expected == null) return false;
+
     let actualKeys = Object.keys(actual),
         expectedKeys = Object.keys(expected);
 
@@ -50,35 +49,53 @@ function deepStrictEqual(actual, expected) {
     return true;
 }
 
-export const runTest = async function(name, input, options, output) {
+const tests = [];
+
+export const failedTests = new Set();
+
+const asyncTest = async function(id, name, input, options, output) {
     input = input.trim();
 
-    let id = ++testUniqueId,
-        actual, expected,
-        label = 'Test `' + name + '` ',
-        time = performance.now();
+    let actual, expected,
+        label = 'Test `' + name + '` ';
 
     try {
         actual = babel.transform(input, { plugins: [[plugin, options]], ast: true, comments: false, parserOpts: { ranges: false } });
         expected = babel.transform(output, { ast: true, comments: false, parserOpts: { ranges: false } });
     } catch (e) {
-        return console.log(
-            label + bRed + fWhite + 'FAILED' + reset + ' (' + id + ')\n'
-            + (e.stack ?? e).split('\n').slice(0, 6).join('\n')
-        );
+        failedTests.add(id);
+        if (!errorWasShowed) {
+            console.error(
+                label + bRed + 'FAILED' + reset + '\n'
+                + (e.stack ?? e).split('\n').slice(0, 6).join('\n') + '\n'
+            );
+            console.log = () => {};
+            errorWasShowed = true;
+        }
+        return;
     }
 
     if (!deepStrictEqual(actual.ast.program.body, expected.ast.program.body)) {
-        return console.log(
-            '\n' + label + bRed + fWhite + 'FAILED' + reset + ' (' + id + ')' + '\n\n'
-            + fYellow + '--- EXPECTED ---' + reset + '\n'
-            + expected.code + '\n'
-            + fYellow + '---- ACTUAL ----' + reset + '\n'
-            + actual.code
-        );
+        failedTests.add(id);
+        if (!errorWasShowed) {
+            console.error(
+                label + bRed + 'FAILED' + reset + '\n\n'
+                + fYellow + '--- EXPECTED ---' + reset + '\n'
+                + expected.code + '\n'
+                + fYellow + '---- ACTUAL ----' + reset + '\n'
+                + actual.code + '\n'
+            );
+            console.log = () => {};
+            errorWasShowed = true;
+        }
+        return;
     }
+}
 
-    const left = (performance.now() - time).toFixed(3) + 'ms';
+export const runTest = function(name, input, options, output) {
+    tests.push(asyncTest(++lastTestId, name, input, options, output));
+}
 
-    console.log(label + bGreen + fBlack + 'COMPLETED' + reset + ' in ' + left + ' (' + id + ')');
+export const awaitTests = function() {
+    return Promise.all(tests);
 }

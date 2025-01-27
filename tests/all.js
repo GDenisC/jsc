@@ -1,4 +1,6 @@
-import { runTest } from './assert.js';
+import { runTest, awaitTests, failedTests, lastTestId } from './assert.js';
+
+const time = performance.now();
 
 runTest(
     'Empty Class',
@@ -66,3 +68,9 @@ runTest(
     fs.readFileSync('./concepting/classDestructured.js', 'utf8')
 );
 */
+
+awaitTests().then(() => console.warn(
+    'All tests took ' + (performance.now() - time).toFixed(3) + 'ms.\n'
+    + 'Failed tests: ' + failedTests.size + '/' + lastTestId
+    + ' (' + (failedTests.size / lastTestId * 100).toFixed(1) + '%' + ')'
+))
