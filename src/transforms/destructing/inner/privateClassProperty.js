@@ -3,7 +3,7 @@ import { raise } from '../error.js';
 import { classProperty } from './classProperty.js';
 
 /**
- * @param {import('../../class-destructuring.js').ClassDestructuring} ctx
+ * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.PrivateClassProperty>} path
  */
 export const privateClassProperty = function(ctx, className, path) {

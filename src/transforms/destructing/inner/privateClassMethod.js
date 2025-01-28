@@ -3,7 +3,7 @@ import { raise } from '../error.js';
 import { classMethod } from './classMethod.js';
 
 /**
- * @param {import('../../class-destructuring.js').ClassDestructuring} ctx
+ * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.ClassPrivateMethod>} path
  */
 export const classPrivateMethod = function(ctx, className, path) {

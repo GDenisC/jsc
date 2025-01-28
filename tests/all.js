@@ -135,6 +135,13 @@ runTest(
     'function Class_method(self) {} let a = {}; Class_method(a);'
 );
 
+runTest(
+    '#4: `self.{method}()` bug',
+    'class Class { constructor() { this.method(); } method() {} }',
+    { classDestructuring: {} },
+    'function Class_constructor() { var self = {}; Class_method(self); return self; } function Class_method(self) {}'
+);
+
 /*
 import fs from 'node:fs';
 

@@ -1,7 +1,7 @@
 import t from '@babel/types';
 
 /**
- * @param {import('../../../class-destructuring').ClassDestructuring} ctx
+ * @param {import('../../../class-destructing').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.MemberExpression>} path
  */
 export const transformMemberExpression = function(ctx, path, className, varName) {
@@ -10,7 +10,9 @@ export const transformMemberExpression = function(ctx, path, className, varName)
         object = node.object,
         property = node.property;
 
-    if (!parent.isCallExpression() || !t.isIdentifier(object) || object.name != varName || !t.isIdentifier(property)) return;
+    if (!parent.isCallExpression() || !t.isIdentifier(object) || object.name != varName) return;
+
+    t.assertIdentifier(property);
 
     path.replaceWith(
         t.identifier(

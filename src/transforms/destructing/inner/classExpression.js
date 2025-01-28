@@ -2,7 +2,7 @@ import t from '@babel/types';
 import { classDeclaration } from './classDeclaration.js';
 
 /**
- * @param {import('../../class-destructuring').ClassDestructuring} ctx
+ * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<import('@babel/types').ClassExpression>} path
  */
 export const classExpression = function(ctx, path) {

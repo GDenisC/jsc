@@ -2,7 +2,7 @@ import t from '@babel/types';
 import { raise } from '../error.js';
 
 /**
- * @param {import('../../class-destructuring').ClassDestructuring} ctx
+ * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.ClassProperty>} path
  */
 export const classProperty = function(ctx, className, path) {

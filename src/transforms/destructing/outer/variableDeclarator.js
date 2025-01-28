@@ -3,7 +3,7 @@ import { raise } from '../error.js';
 import { transformMemberExpression } from './transforms/memberExpression.js';
 
 /**
- * @param {import('../../class-destructuring').ClassDestructuring} ctx
+ * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.VariableDeclarator>} path
  */
 export const variableDeclarator = function(ctx, path) {

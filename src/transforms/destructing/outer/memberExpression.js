@@ -1,7 +1,7 @@
 import t from '@babel/types';
 
 /**
- * @param {import('../../class-destructuring').ClassDestructuring} ctx
+ * @param {import('../../class-destructing').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.MemberExpression>} path
  */
 export const memberExpression = function(ctx, path) {

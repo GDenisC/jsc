@@ -7,7 +7,7 @@ import { transformClassConstructorBody } from './transforms/constructor.js';
 import { privateClassProperty } from './privateClassProperty.js';
 
 /**
- * @param {import('../../class-destructuring').ClassDestructuring} ctx
+ * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.ClassDeclaration>} path
  */
 export const classDeclaration = function(ctx, path) {
@@ -23,20 +23,22 @@ export const classDeclaration = function(ctx, path) {
     path.traverse({
         ClassPrivateMethod(childPath) {
             if (childPath.parentPath.parentPath != path) return;
-            replaces.push(classPrivateMethod(ctx, className, childPath));
+            const result = classPrivateMethod(ctx, className, childPath);
+            replaces.push(result);
         },
         ClassMethod(childPath) {
             if (childPath.parentPath.parentPath != path) return;
-            replaces.push(classMethod(ctx, className, childPath));
+            const result = classMethod(ctx, className, childPath)
+            replaces.push(result);
         },
         ClassProperty(childPath) {
             if (childPath.parentPath.parentPath != path) return;
-            let result = classProperty(ctx, className, childPath);
+            const result = classProperty(ctx, className, childPath);
             if (result) replaces.push(result);
         },
         ClassPrivateProperty(childPath) {
             if (childPath.parentPath.parentPath != path) return;
-            let result = privateClassProperty(ctx, className, childPath);
+            const result = privateClassProperty(ctx, className, childPath);
             if (result) replaces.push(result);
         },
     });

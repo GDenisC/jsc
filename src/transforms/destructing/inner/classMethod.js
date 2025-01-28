@@ -3,7 +3,7 @@ import { raise } from '../error.js';
 import { transformClassFunctionBody } from './transforms/method.js';
 
 /**
- * @param {import('../../class-destructuring').ClassDestructuring} ctx
+ * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.ClassMethod>} path
  */
 export const classMethod = function(ctx, className, path) {

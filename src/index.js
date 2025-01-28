@@ -1,4 +1,4 @@
-import { ClassDestructuring } from './transforms/class-destructuring.js';
+import { ClassDestructing } from './transforms/class-destructing.js';
 
 /*
 function generateUsableIdentifier (identifier) {
@@ -15,15 +15,24 @@ function generateUsableIdentifier (identifier) {
 }
 */
 
-const plugin = function (_babel, options = {}) {
-	let visitor = {};
+const plugin = function(_babel, options = {}) {
+	let transformers = [],
+		visitor = {};
 
 	if (options.classDestructuring) {
-		let classDestructuring = new ClassDestructuring(options.classDestructuring);
-		visitor = Object.assign(visitor, classDestructuring.getVisitors());
+		let classDestructing = new ClassDestructing(options.classDestructuring);
+		transformers.push(classDestructing);
+		visitor = Object.assign(visitor, classDestructing.getVisitors());
 	}
 
-	return { visitor };
+	return {
+		visitor,
+		post: () => {
+			for (const transformer of transformers) {
+				transformer.postTransform();
+			}
+		}
+	};
 }
 
 export default plugin;
