@@ -22,8 +22,5 @@ export const classExpression = function(ctx, path) {
         )
     );
 
-    return classDeclaration(
-        ctx,
-        classPath
-    );
+    return classDeclaration(ctx, classPath);
 }

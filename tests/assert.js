@@ -60,14 +60,14 @@ const asyncTest = async function(id, name, input, options, output) {
         label = 'Test `' + name + '` ';
 
     try {
-        actual = babel.transform(input, { plugins: [[plugin, options]], ast: true, comments: false, parserOpts: { ranges: false } });
-        expected = babel.transform(output, { ast: true, comments: false, parserOpts: { ranges: false } });
+        actual = babel.transform(input, { plugins: [[plugin, options]] });
+        expected = babel.transform(output);
     } catch (e) {
         failedTests.add(id);
         if (!errorWasShowed) {
             console.error(
                 label + bRed + 'FAILED' + reset + '\n'
-                + (e.stack ?? e).split('\n').slice(0, 6).join('\n') + '\n'
+                + (e.stack ?? e).split('\n').slice(0, 10).join('\n') + '\n'
             );
             console.log = () => {};
             errorWasShowed = true;
@@ -75,7 +75,7 @@ const asyncTest = async function(id, name, input, options, output) {
         return;
     }
 
-    if (!deepStrictEqual(actual.ast.program.body, expected.ast.program.body)) {
+    if (actual.code !== expected.code) {
         failedTests.add(id);
         if (!errorWasShowed) {
             console.error(

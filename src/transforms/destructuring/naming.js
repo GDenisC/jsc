@@ -45,23 +45,46 @@ const generateClassName = function(prefix, className, node, debug = false) {
 
 const properties = Symbol('properties');
 
+/** Stores methods as `string`s and properties as `Node`s for each class */
 export class ClassMap {
+    /** @type {Record<string, Record<string, string | (t.ClassProperty & { className: string })>>} */
     #classes;
 
     constructor(options) {
-        /** @type {Record<string, Record<string, string>>} */
         this.#classes = {};
         this.options = options;
     }
 
+    has(className) {
+        return !!this.#classes[className];
+    }
+
+    hasConstructor(className) {
+        return !!this.#classes[className]['m_constructor'];
+    }
+
+    getConstructorName(className) {
+        return (
+            this.#classes[className]['m_constructor'] = className + '_constructor'
+        );
+    }
+
+    register(name) {
+        if (this.#classes[name])
+            return raise('Cannot register 2 classes with the same name (' + name + ')');
+
+        this.#classes[name] = this.options.mangleProperties
+            ? { [properties]: [] }
+            : {};
+    }
+
     /** @param {AnyClassMethod} node */
     #addMethod(className, node) {
-        if (!this.#classes[className]) {
-            this.#classes[className] = this.options.mangleProperties ? { [properties]: [] } : {};
-        }
+        if (!this.#classes[className])
+            return raise('Unregistered class `' + className + '`');
 
         let uniqueName = 'm' + (node.static ? 's' : '') + '_' + node.key.name,
-            generatedName = generateClassName( this.options.prefix, className, node, this.options.debug);
+            generatedName = generateClassName(this.options.prefix, className, node, this.options.debug);
 
         return (
             this.#classes[className][uniqueName] = generatedName
@@ -70,7 +93,16 @@ export class ClassMap {
 
     /** @param {AnyClassProperty} node */
     #addProperty(className, node) {
-        raise('TODO: addProperty:\n' + util.inspect(node, false, null, true));
+        if (!this.#classes[className])
+            return raise('Unregistered class `' + className + '`');
+
+        let uniqueName = 'p' + (node.static ? 's' : '') + '_' + node.key.name,
+            generatedName = generateClassName(this.options.prefix, className, node, this.options.debug);;
+
+        node.className = generatedName;
+        this.#classes[className][uniqueName] = node;
+
+        return generatedName;
     }
 
     /** @param {AnyClassNode} node */
@@ -92,19 +124,24 @@ export class ClassMap {
     }
 
     #getMethod(className, isStatic, name) {
-        if (!this.#classes[className])
+        const cls = this.#classes[className];
+
+        if (!cls)
             raise('Unknown class: ' + className);
 
-        if (typeof name != 'string')
+        const uniqueName = 'm' + (isStatic ? 's' : '') + '_' + name;
+
+        if (typeof name != 'string' || !cls[uniqueName])
             raise(
                 'Failed to get a method from ClassMap\n'
                 + 'Debug info:\n'
                 + '- className: ' + util.inspect(className, false, null, true) + '\n'
                 + '- isStatic: ' + util.inspect(isStatic, false, null, true) + '\n'
-                + '- name: ' + util.inspect(name, false, null, true)
+                + '- name: ' + util.inspect(name, false, null, true) + '\n'
+                + '- cls: ' + util.inspect(cls, false, null, true).replaceAll('\n', ' ')
             );
 
-        return this.#classes[className]['m' + (isStatic ? 's' : '') + '_' + name];
+        return cls[uniqueName];
     }
 
     getInstanceMethod(className, name) {
@@ -139,37 +176,63 @@ export class ClassMap {
         return this.#getProperty(className, true, name);
     }
 
-    addProperty(className, property) {
-        if (!this.options.mangleProperties)
-            throw new Error('addProperty should not be called here')
+    hasProperties(className, includeStatic = true) {
+        const cls = this.#classes[className];
 
-        if (!this.#classes[className])
-            this.#classes[className] = { [properties]: [] };
+        if (!cls)
+            return raise('Unregistered class `' + className + '`');
 
-        return this.#classes[className][properties].push(property) - 1;
+        const keys = Object.keys(cls);
+
+        for (let i = 0, l = keys.length; i < l; ++i) {
+            if (keys[i][0] == 'p' && (includeStatic || keys[i][1] != 's'))
+                return true;
+        }
+
+        return false;
     }
 
-    getPropertyIndex(className, property) {
-        if (!this.options.mangleProperties)
-            throw new Error('getPropertyIndex should not be called here')
+    /**
+     * @returns {t.ClassProperty[]}
+     */
+    getProperties(className) {
+        const cls = this.#classes[className];
 
-        if (!this.#classes[className])
-            raise('Unknown class: ' + className);
+        if (!cls)
+            return raise('Unregistered class `' + className + '`');
 
-        let index = this.#classes[className][properties].indexOf(property);
+        const keys = Object.keys(cls),
+            props = [];
 
-        return index == -1 ? raise('Unknown property: ' + property) : index;
+        for (let i = 0, l = keys.length; i < l; ++i) {
+            if (keys[i][0] == 'p')
+                props.push(cls[keys[i]]);
+        }
+
+        return props;
     }
 
-    getOrAddPropertyIndex(className, property) {
+    addMangledProperty(className, property) {
         if (!this.options.mangleProperties)
-            throw new Error('getOrAddPropertyIndex should not be called here')
+            throw new Error('addMangledProperty should not be called here')
 
         if (!this.#classes[className])
-            this.#classes[className] = { [properties]: [] };
+            return raise('Unregistered class `' + className + '`');
 
         let index = this.#classes[className][properties].indexOf(property);
 
         return index == -1 ? this.#classes[className][properties].push(property) - 1 : index;
+    }
+
+    getMangledProperty(className, property) {
+        if (!this.options.mangleProperties)
+            throw new Error('getMangledProperty should not be called here')
+
+        if (!this.#classes[className])
+            return raise('Unregistered class `' + className + '`');
+
+        let index = this.#classes[className][properties].indexOf(property);
+
+        return index == -1 ? raise('Unknown property: ' + property) : index;
     }
 }
