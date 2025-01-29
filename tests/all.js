@@ -142,6 +142,62 @@ runTest(
     'function Class_constructor() { var self = {}; Class_method(self); return self; } function Class_method(self) {}'
 );
 
+runTest(
+    'Class getter',
+    'class Class { get getter() { return null; } }',
+    { classDestructuring: {} },
+    'function Class_get_getter(self) { return null; }'
+);
+
+runTest(
+    'Class static getter',
+    'class Class { static get getter() { return null; } }',
+    { classDestructuring: {} },
+    'function Class_static_get_getter() { return null; }'
+);
+
+runTest(
+    'Class getter usage',
+    'class Class { get getter() { return null; } } new Class().getter;',
+    { classDestructuring: {} },
+    'function Class_get_getter(self) { return null; } Class_getter({});'
+);
+
+runTest(
+    'Class static getter usage',
+    'class Class { static get getter() { return null; } } Class.getter;',
+    { classDestructuring: {} },
+    'function Class_static_get_getter() { return null; } Class_static_getter();'
+);
+
+runTest(
+    'Class setter',
+    'class Class { set setter(value) {} }',
+    { classDestructuring: {} },
+    'function Class_set_setter(self, value) {}'
+);
+
+runTest(
+    'Class static setter',
+    'class Class { static set setter(value) {} }',
+    { classDestructuring: {} },
+    'function Class_static_set_setter(value) {}'
+);
+
+runTest(
+    'Class setter usage',
+    'class Class { set setter(value) {} } new Class().setter = null;',
+    { classDestructuring: {} },
+    'function Class_set_setter(self, value) {} Class_setter({}, null);'
+);
+
+runTest(
+    'Class static setter usage',
+    'class Class { static set setter(value) {} } Class.setter = null;',
+    { classDestructuring: {} },
+    'function Class_static_set_setter(value) {} Class_static_setter(null);'
+);
+
 /*
 import fs from 'node:fs';
 
