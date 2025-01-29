@@ -200,16 +200,23 @@ runTest(
 
 runTest(
 	'Class private prop bug',
-	'class Class { static #prop = 1; get prop() { return this.#prop; } } console.log(new Class().prop);',
+	'class Class { static #prop = 1; get prop() { return this.#prop; } } new Class().prop;',
 	{ classDestructuring: {} },
-	'var Class_static_private_prop = 1; function Class_get_prop(self) { return Class_static_private_prop; } console.log(Class_get_prop({}));'
+	'var Class_static_private_prop = 1; function Class_get_prop(self) { return Class_static_private_prop; } Class_get_prop({});'
 );
 
 runTest(
 	'Class static private prop bug',
-	'class Class { static #prop = 1; static get prop() { return Class.#prop; } } console.log(Class.prop);',
+	'class Class { static #prop = 1; static get prop() { return Class.#prop; } } Class.prop;',
 	{ classDestructuring: {} },
-	'var Class_static_private_prop = 1; function Class_static_get_prop() { return Class_static_private_prop; } console.log(Class_static_get_prop());'
+	'var Class_static_private_prop = 1; function Class_static_get_prop() { return Class_static_private_prop; } Class_static_get_prop();'
+);
+
+runTest(
+	'Class method with default params as static properties',
+	'class Class { static #default = 1; constructor(x = Class.#default) { this.x = x; } } new Class();',
+	{ classDestructuring: {} },
+	'var Class_static_private_default = 1; function Class_constructor(x = Class_static_private_default) { var self = {}; self.x = x; return self; } Class_constructor();'
 );
 
 /*

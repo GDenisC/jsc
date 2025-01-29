@@ -1,6 +1,7 @@
 import t from '@babel/types';
 import { raise } from '../error.js';
 import { transformClassFunctionBody } from './transforms/method.js';
+import { transformParams } from './transforms/params.js';
 
 /**
  * @param {import('../../class-destructing.js').ClassDestructing} ctx
@@ -13,7 +14,7 @@ export const classMethod = function(ctx, className, path) {
 	if (!t.isIdentifier(key))
 		return raise('All class methods should be named');
 
-	const params = node.params,
+	const params = transformParams(ctx, node.params, path.scope, path),
 		isConstructor = node.kind == 'constructor';
 
 	if (!isConstructor && !node.static) params.unshift(t.identifier('self'));
