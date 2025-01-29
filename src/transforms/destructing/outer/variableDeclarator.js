@@ -7,24 +7,24 @@ import { transformMemberExpression } from './transforms/memberExpression.js';
  * @param {import('@babel/core').NodePath<t.VariableDeclarator>} path
  */
 export const variableDeclarator = function(ctx, path) {
-    const node = path.node;
-    if (!t.isNewExpression(node.init)) return;
+	const node = path.node;
+	if (!t.isNewExpression(node.init)) return;
 
-    let block = path.parentPath.parentPath;
+	let block = path.parentPath.parentPath;
 
-    if (!block.isBlock() && !block.isProgram())
-        return raise('Unexpected position of variableDeclarator (line: ' + path.node.loc?.start.line + ')');
+	if (!block.isBlock() && !block.isProgram())
+		return raise('Unexpected position of variableDeclarator (line: ' + path.node.loc?.start.line + ')');
 
-    t.assertIdentifier(node.id);
+	t.assertIdentifier(node.id);
 
-    const className = node.init.callee.name,
-        varName = node.id.name;
+	const className = node.init.callee.name,
+		varName = node.id.name;
 
-    node.init = ctx.classes.hasConstructor(className)
-        ? t.callExpression(t.identifier(ctx.classes.getInstanceMethod(className, 'constructor')), node.init.arguments)
-        : t.objectExpression([]);
+	node.init = ctx.classes.hasConstructor(className)
+		? t.callExpression(t.identifier(ctx.classes.getInstanceMethod(className, 'constructor')), node.init.arguments)
+		: t.objectExpression([]);
 
-    block.traverse({
-        MemberExpression: path => transformMemberExpression(ctx, path, className, varName)
-    });
+	block.traverse({
+		MemberExpression: path => transformMemberExpression(ctx, path, className, varName)
+	});
 }

@@ -7,22 +7,22 @@ import { transformClassFunctionBody } from './transforms/method.js';
  * @param {import('@babel/core').NodePath<t.ClassMethod>} path
  */
 export const classMethod = function(ctx, className, path) {
-    const node = path.node,
-        key = node.key;
+	const node = path.node,
+		key = node.key;
 
-    if (!t.isIdentifier(key))
-        return raise('All class methods should be named');
+	if (!t.isIdentifier(key))
+		return raise('All class methods should be named');
 
-    const params = node.params,
-        isConstructor = node.kind == 'constructor';
+	const params = node.params,
+		isConstructor = node.kind == 'constructor';
 
-    if (!isConstructor && !node.static) params.unshift(t.identifier('self'));
+	if (!isConstructor && !node.static) params.unshift(t.identifier('self'));
 
-    return t.functionDeclaration(
-        t.identifier(ctx.classes.add(className, node)),
-        params,
-        transformClassFunctionBody(ctx, className, path.get('body'), isConstructor),
-        node.generator,
-        node.async
-    );
+	return t.functionDeclaration(
+		t.identifier(ctx.classes.add(className, node)),
+		params,
+		transformClassFunctionBody(ctx, className, path.get('body'), isConstructor),
+		node.generator,
+		node.async
+	);
 }

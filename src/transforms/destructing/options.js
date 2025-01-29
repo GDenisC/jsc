@@ -1,8 +1,8 @@
 const defaultOptions = {
-    variableKind: 'var',
-    prefix: '',
-    mangleProperties: false,
-    debug: false
+	variableKind: 'var',
+	prefix: '',
+	mangleProperties: false,
+	debug: false
 };
 
 /**
@@ -10,9 +10,9 @@ const defaultOptions = {
  * @returns {typeof defaultOptions}
  */
 export const setOptions = function(options) {
-    if (options.variableKind && !['var', 'let', 'const'].includes(options.variableKind)) {
-        options.variableKind = 'var';
-    }
+	if (options.variableKind && !['var', 'let', 'const'].includes(options.variableKind)) {
+		options.variableKind = 'var';
+	}
 
-    return Object.assign(defaultOptions, options);
+	return Object.assign(defaultOptions, options);
 }
