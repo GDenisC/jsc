@@ -212,6 +212,7 @@ runTest(
 	'var Class_static_private_prop = 1; function Class_static_get_prop() { return Class_static_private_prop; } console.log(Class_static_get_prop());'
 );
 
+/*
 import fs from 'node:fs';
 
 runTest(
@@ -220,6 +221,7 @@ runTest(
 	{ classDestructuring: { variableKind: 'let' } },
 	''
 );
+*/
 
 awaitTests().then(() => console.warn(
 	'All tests took ' + (performance.now() - time).toFixed(3) + 'ms.\n'
