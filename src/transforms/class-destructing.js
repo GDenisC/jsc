@@ -17,7 +17,7 @@ export class ClassDestructing {
 	constructor(options) {
 		this.options = setOptions(options);
 		this.classes = new ClassMap(this.options);
-		/** @type {import('@babel/core').NodePath<import('@babel/types').ClassMethod>[]} */
+		/** @type {{ path: import('@babel/core').NodePath<import('@babel/types').ClassMethod>, className: string }[]} */
 		this.postTransformPaths = [];
 	}
 
@@ -33,8 +33,12 @@ export class ClassDestructing {
 	postTransform() {
 		for (const { path, className } of this.postTransformPaths) {
 			path.traverse({
-				MemberExpression: childPath => transformMemberExpression(this, childPath, className, 'self')
-			});
+				MemberExpression: childPath => {
+					transformMemberExpression(this, childPath, className, 'self');
+					memberExpression(this, childPath);
+				},
+				VariableDeclarator: path => variableDeclarator(this, path)
+			}, this);
 		}
 	}
 }
