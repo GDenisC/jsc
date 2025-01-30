@@ -5,6 +5,7 @@ import { classExpression } from './destructing/inner/classExpression.js';
 import { memberExpression } from './destructing/outer/memberExpression.js';
 import { variableDeclarator } from './destructing/outer/variableDeclarator.js';
 import { transformMemberExpression } from './destructing/outer/transforms/memberExpression.js';
+import { newExpression } from './destructing/outer/newExpression.js';
 
 /**
  * function name template: `{classname}[_static][_(get|set)][_private]_{property}`
@@ -19,10 +20,12 @@ export class ClassDestructing {
 		this.classes = new ClassMap(this.options);
 		/** @type {{ path: import('@babel/core').NodePath<import('@babel/types').ClassMethod>, className: string }[]} */
 		this.postTransformPaths = [];
+		this.path = null;
 	}
 
 	getVisitors() {
 		return {
+			Program: path => this.path = path,
 			ClassDeclaration: path => classDeclaration(this, path),
 			ClassExpression: path => classExpression(this, path),
 			MemberExpression: path => memberExpression(this, path),
@@ -40,5 +43,8 @@ export class ClassDestructing {
 				VariableDeclarator: path => variableDeclarator(this, path)
 			}, this);
 		}
+
+		// TODO: rewrite the code again to remove this line :)
+		this.path.traverse({ NewExpression: path => newExpression(this, path) });
 	}
 }
