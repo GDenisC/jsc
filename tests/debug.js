@@ -2,29 +2,17 @@ import babel from '@babel/core';
 import plugin from '../src/index.js';
 
 const input = `
-class Class {
-	constructor() {
-		this.x = 1;
-	}
-
-	hello(a) {
-		return this.x + a;
-	}
-
-	static world() {
-		return 100;
-	}
-}
-
-let x = new Class();
-console.log(x.hello(Class.world()));
+var Class = class {
+	constructor() {}
+};
 `.trim();
 
 console.log('------------ INPUT ------------');
-console.log(input);
+console.log(input.replaceAll('\t', '  '));
 
+console.log('------------ DEBUG ------------');
 const result = babel.transformSync(input, {
-	plugins: [[plugin, { classDestructuring: true }]]
+	plugins: [[plugin, { classDestructuring: { debug: true } }]]
 });
 
 console.log('------------ OUTPUT -----------');
