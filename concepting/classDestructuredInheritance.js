@@ -69,7 +69,7 @@ function Player_static_set_defaultName(name) {
 }
 
 function Player_static_get_instanceCount() {
-	return Entity_static_getAllInstances().toArray().length;
+	return Player_static_getAllInstances().toArray().length;
 }
 
 function Player_static_invalidateName(name) {

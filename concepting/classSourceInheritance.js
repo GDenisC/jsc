@@ -50,7 +50,7 @@ class Player extends Entity {
 		Player.#defaultName = name;
 	}
 
-	static get instanceCount () { return Entity.getAllInstances().toArray().length }
+	static get instanceCount () { return Player.getAllInstances().toArray().length }
 	// setter error thrower already inherited
 
 	static invalidateName (name) {

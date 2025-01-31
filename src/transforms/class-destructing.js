@@ -12,7 +12,7 @@ import { newExpression } from './destructing/outer/newExpression.js';
  *
  * only work with top-level classes
  *
- * ### TODO: setters and getters must be converted from assignments and gets(proper term?) into function calls, since they're functions
+ * ### TODO: setters and getters must be converted from computed accessors into function calls
  */
 export class ClassDestructing {
 	constructor(options) {
