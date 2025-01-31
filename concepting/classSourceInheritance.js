@@ -135,7 +135,7 @@ setInterval(() => {
 }, 1000);
 
 for (let entity of Entity.getAllInstances()) {
-	let head = `Entity of ID #${entity.id} is `;
+	let head = `Entity of ID #${entity.id} is`;
 	console.log(entity.isPlayer ?
 		`${head} a Player of the name ${entity.name}.`
 	:

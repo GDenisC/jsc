@@ -1,9 +1,12 @@
+const ClassDestructuredId = '_876342998743';
+
 import EventEmitter from 'node:events';
 
 function IllegalAssignmentError_constructor(propname, extra) {
 	let message = `Cannot assign to ${propname}!`;
 	if (extra) message += '\n' + extra;
 	let self = new Error(message);
+	self[ClassDestructuredId] = 1;
 	return self;
 }
 
@@ -26,13 +29,19 @@ function Entity_static_getAllInstances() {
 let Entity_static_private_id = 0;
 function Entity_constructor() {
 	let self = new EventEmitter();
+	self[ClassDestructuredId] = 2;
 	self.Entity_static_private_id = Entity_static_get_instanceCount();
 	Entity_static_private_instanceMap.set(Entity_get_id(self), self);
 	return self;
 }
 
 function Entity_get_isPlayer(self) {
-	return false;
+	switch (self[ClassDestructuredId]) {
+		case 2:
+			return false;
+		case 3:
+			return Player_get_isPlayer(self);
+	}
 }
 function Entity_set_isPlayer(self, _) {
 	throw new IllegalAssignmentError('isPlayer');
@@ -81,6 +90,7 @@ let Player_static_private_name = '';
 function Player_constructor(name = Player_static_private_defaultName) {
 	Player_static_invalidateName(name);
 	let self = Entity_constructor();
+	self[ClassDestructuredId] = 3;
 	self.Player_static_private_name = name;
 	self.hp = 1;
 	self.hpmax = 10;
@@ -160,7 +170,7 @@ for (let i = 0; i < 9; i++) {
 }
 
 const bookReference = Entity_static_getInstance(Entity_static_get_instanceCount() - 1);
-if (!WHAT_get_isPlayer(bookReference)) {
+if (!Entity_get_isPlayer(bookReference)) {
 	throw new TypeError('what the fuck just happened');
 }
 Player_rename(bookReference, 'Ted');
@@ -174,8 +184,8 @@ setInterval(() => {
 }, 1000);
 
 for (let entity of Entity_static_getAllInstances()) {
-	let head = `Entity of ID #${Entity_get_id(entity)} is `;
-	console.log(WHAT_get_isPlayer(entity) ? `${head} a Player of the name ${Player_get_name(entity)}.` : `${head} not a Player.`);
+	let head = `Entity of ID #${Entity_get_id(entity)} is`;
+	console.log(Entity_get_isPlayer(entity) ? `${head} a Player of the name ${Player_get_name(entity)}.` : `${head} not a Player.`);
 }
 for (let player of Player_static_getAllInstances()) {
 	console.log(`Player ${Player_get_name(player)} (#${Entity_get_id(player)}) has ${(Player_get_hpFilledPercent(bookReference) * 100).toFixed(2)}% health.`);
