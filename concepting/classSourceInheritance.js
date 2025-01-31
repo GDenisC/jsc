@@ -110,9 +110,7 @@ class Player extends Entity {
 
 for (let adjective of ['first', 'second', 'third']) {
 	let entity = new Entity();
-	entity.on('tick', () => {
-		console.log(`ticked the ${adjective} entity!`);
-	});
+	entity.on('tick', () => console.log(`ticked the ${adjective} entity!`));
 }
 
 new Player('Albert');

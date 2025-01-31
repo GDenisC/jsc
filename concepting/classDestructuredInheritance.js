@@ -82,7 +82,7 @@ function Player_static_invalidateName(name) {
 }
 
 function Player_static_getAllInstances() {
-	return Entity_static_getAllInstances().filter(entity => entity.isPlayer);
+	return Entity_static_getAllInstances().filter(entity => Entity_get_isPlayer(entity));
 }
 
 let Player_static_private_name = '';
