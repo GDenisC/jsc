@@ -1,12 +1,10 @@
-const ClassDestructuredId = '_876342998743';
-
 import EventEmitter from 'node:events';
 
 function IllegalAssignmentError_constructor(propname, extra) {
 	let message = `Cannot assign to ${propname}!`;
 	if (extra) message += '\n' + extra;
 	let self = new Error(message);
-	self[ClassDestructuredId] = 1;
+	self.classDestructuredId = 1;
 	return self;
 }
 
@@ -29,14 +27,14 @@ function Entity_static_getAllInstances() {
 let Entity_static_private_id = 0;
 function Entity_constructor() {
 	let self = new EventEmitter();
-	self[ClassDestructuredId] = 2;
+	self.classDestructuredId = 2;
 	self.Entity_static_private_id = Entity_static_get_instanceCount();
 	Entity_static_private_instanceMap.set(Entity_get_id(self), self);
 	return self;
 }
 
 function Entity_get_isPlayer(self) {
-	switch (self[ClassDestructuredId]) {
+	switch (self.classDestructuredId) {
 		case 2:
 			return false;
 		case 3:
@@ -44,7 +42,7 @@ function Entity_get_isPlayer(self) {
 	}
 }
 function Entity_set_isPlayer(self, _) {
-	throw new IllegalAssignmentError('isPlayer');
+	throw IllegalAssignmentError_constructor('isPlayer');
 }
 
 function Entity_get_id(self) {
@@ -90,7 +88,7 @@ let Player_static_private_name = '';
 function Player_constructor(name = Player_static_private_defaultName) {
 	Player_static_invalidateName(name);
 	let self = Entity_constructor();
-	self[ClassDestructuredId] = 3;
+	self.classDestructuredId = 3;
 	self.Player_static_private_name = name;
 	self.hp = 1;
 	self.hpmax = 10;
