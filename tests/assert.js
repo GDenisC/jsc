@@ -55,7 +55,7 @@ const tests = [];
 
 export const failedTests = new Set();
 
-const asyncTest = async function(id, name, input, options, output) {
+const asyncTest = async function (id, name, input, options, output) {
 	input = input.trim();
 
 	let actual, expected,
@@ -71,7 +71,7 @@ const asyncTest = async function(id, name, input, options, output) {
 				label + bRed + 'FAILED' + reset + '\n'
 				+ (e.stack ?? e).split('\n').slice(0, 10).join('\n') + '\n'
 			);
-			console.log = () => {};
+			console.log = () => { };
 			errorWasShowed = true;
 		}
 		return;
@@ -87,17 +87,17 @@ const asyncTest = async function(id, name, input, options, output) {
 				+ fYellow + '---- ACTUAL ----' + reset + '\n'
 				+ actual.code + '\n'
 			);
-			console.log = () => {};
+			console.log = () => { };
 			errorWasShowed = true;
 		}
 		return;
 	}
 }
 
-export const runTest = function(name, input, options, output) {
+export const runTest = function (name, input, options, output) {
 	tests.push(asyncTest(++lastTestId, name, input, options, output));
 }
 
-export const awaitTests = function() {
+export const awaitTests = function () {
 	return Promise.all(tests);
 }

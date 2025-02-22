@@ -6,7 +6,7 @@ export const visitor = function PrivateName(expr) {
 }
 
 /** @param {t.Node} node */
-export const nodeReplacePrivateName = function(node, scope, parentPath) {
+export const nodeReplacePrivateName = function (node, scope, parentPath) {
 	// see ./replaceThis.js
 	traverse.default(node, { PrivateName: visitor }, scope, null, parentPath);
 }

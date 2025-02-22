@@ -5,7 +5,7 @@ import { nodeReplaceThis } from './replaceThis.js';
  * @param {import('../../../class-destructing.js').ClassDestructing} ctx
  * @param {t.BlockStatement} node
  */
-export const transformClassConstructorBody = function(ctx, className, node, scope, parentPath) {
+export const transformClassConstructorBody = function (ctx, className, node, scope, parentPath) {
 	const objectProperties = [],
 		body = [];
 

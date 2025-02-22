@@ -6,7 +6,7 @@ export const visitor = function ThisExpression(expr) {
 }
 
 /** @param {t.Node} node */
-export const nodeReplaceThis = function(node, scope, parentPath) {
+export const nodeReplaceThis = function (node, scope, parentPath) {
 	// babel???
 	traverse.default(node, { ThisExpression: visitor }, scope, null, parentPath);
 }

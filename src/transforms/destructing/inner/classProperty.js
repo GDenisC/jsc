@@ -5,7 +5,7 @@ import { raise } from '../error.js';
  * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.ClassProperty>} path
  */
-export const classProperty = function(ctx, className, path) {
+export const classProperty = function (ctx, className, path) {
 	const node = path.node;
 
 	if (!t.isIdentifier(node.key))

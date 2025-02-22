@@ -7,7 +7,7 @@ import { visitor as ThisExpression } from './replaceThis.js'
  * @param {import('../../../class-destructing.js').ClassDestructing} ctx
  * @param {(t.Identifier | t.AssignmentPattern)[]} params
  */
-export const transformParams = function(ctx, params, scope, parentPath) {
+export const transformParams = function (ctx, params, scope, parentPath) {
     for (let i = 0, l = params.length; i < l; ++i) {
         let node = params[i];
 

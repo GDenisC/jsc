@@ -6,7 +6,7 @@ import { classMethod } from './classMethod.js';
  * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.ClassPrivateMethod>} path
  */
-export const classPrivateMethod = function(ctx, className, path) {
+export const classPrivateMethod = function (ctx, className, path) {
 	const node = path.node,
 		key = node.key;
 

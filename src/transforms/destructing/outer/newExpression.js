@@ -4,7 +4,7 @@ import t from '@babel/types';
  * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.NewExpression>} path
  */
-export const newExpression = function(ctx, path) {
+export const newExpression = function (ctx, path) {
     const node = path.node,
         className = node.callee.name;
 

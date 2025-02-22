@@ -7,7 +7,7 @@ import { transformParams } from './transforms/params.js';
  * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.ClassMethod>} path
  */
-export const classMethod = function(ctx, className, path) {
+export const classMethod = function (ctx, className, path) {
 	const node = path.node,
 		key = node.key;
 

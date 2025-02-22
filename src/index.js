@@ -15,7 +15,7 @@ function generateUsableIdentifier (identifier) {
 }
 */
 
-const plugin = function(_babel, options = {}) {
+const plugin = function (_babel, options = {}) {
 	let transformers = [],
 		visitor = {};
 

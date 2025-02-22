@@ -12,7 +12,7 @@ import { raise } from './error.js';
  * @param {string} className
  * @param {AnyClassNode} node
  * */
-const generateClassName = function(prefix, className, node, debug = false) {
+const generateClassName = function (prefix, className, node, debug = false) {
 	let name = className;
 	if (node.static) name += '_static';
 	if (node.kind == 'get') name += '_get';

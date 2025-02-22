@@ -9,7 +9,7 @@ const defaultOptions = {
  * @param {Partial<typeof defaultOptions>} options
  * @returns {typeof defaultOptions}
  */
-export const setOptions = function(options) {
+export const setOptions = function (options) {
 	if (options.variableKind && !['var', 'let', 'const'].includes(options.variableKind)) {
 		options.variableKind = 'var';
 	}

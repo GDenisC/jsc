@@ -7,7 +7,7 @@ import { visitor as PrivateName } from './replacePrivateName.js';
  * @param {import('../../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.BlockStatement>} path
  */
-export const transformClassFunctionBody = function(ctx, className, path, isConstructor) {
+export const transformClassFunctionBody = function (ctx, className, path, isConstructor) {
 	path.traverse({ ThisExpression, PrivateName });
 
 	if (isConstructor)

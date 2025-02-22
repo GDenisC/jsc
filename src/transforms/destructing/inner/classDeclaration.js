@@ -10,7 +10,7 @@ import { privateClassProperty } from './privateClassProperty.js';
  * @param {import('../../class-destructing.js').ClassDestructing} ctx
  * @param {import('@babel/core').NodePath<t.ClassDeclaration>} path
  */
-export const classDeclaration = function(ctx, path) {
+export const classDeclaration = function (ctx, path) {
 	const className = path.node.id?.name;
 
 	if (!className)
