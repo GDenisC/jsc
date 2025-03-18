@@ -111,7 +111,7 @@ function foo(x) {
 
 ## Unglobalization
 
-- Patches some hooking techniques (replacing a function/method with a malicious clone)
+- Patches some hooking techniques (replacing a function/method with a malicious version)
 - Better code compression results
 
 ```js
